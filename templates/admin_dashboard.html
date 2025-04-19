@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Antlers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-5 fade-in fw-bold">Admin Dashboard</h1>
+            <p class="text-muted fade-in">Manage users, items, and system settings</p>
+        </div>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-primary rounded-pill fade-in">
+            <i class="fas fa-arrow-left me-2"></i>Back to Home
+        </a>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-5 fade-in">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <h3 class="h4 mb-2">Total Users</h3>
+                    <p class="h2 mb-0">{{ stats.total_users }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-clock fa-3x mb-3"></i>
+                    <h3 class="h4 mb-2">Pending Items</h3>
+                    <p class="h2 mb-0">{{ stats.pending_items }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <h3 class="h4 mb-2">Approved Items</h3>
+                    <p class="h2 mb-0">{{ stats.approved_items }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-exchange-alt fa-3x mb-3"></i>
+                    <h3 class="h4 mb-2">Active Borrows</h3>
+                    <p class="h2 mb-0">{{ stats.active_borrows }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="card fade-in mb-5">
+        <div class="card-header bg-white p-4">
+            <h2 class="card-title h4 mb-0">
+                <i class="fas fa-users me-2"></i>Registered Users
+            </h2>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Items Listed</th>
+                            <th scope="col">Items Borrowed</th>
+                            <th scope="col">Join Date</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-circle fa-lg text-primary me-2"></i>
+                                    {{ user.username }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-success rounded-pill">
+                                    {{ user.pending_items|length + user.approved_items|length }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info rounded-pill">
+                                    {{ user.borrowed_items|length }}
+                                </span>
+                            </td>
+                            <td>
+                                <i class="fas fa-calendar-alt text-muted me-2"></i>
+                                {{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}
+                            </td>
+                            <td>
+                                <span class="badge bg-success">Active</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Items Section -->
+    <div class="section-header fade-in mb-4">
+        <h2 class="fw-bold">Pending Items for Approval</h2>
+        <p class="text-muted">Review and approve new item listings</p>
+    </div>
+    
+    <div class="dashboard-grid">
+        {% for item in items %}
+        <div class="card fade-in">
+            {% if item.image %}
+            <div class="position-relative">
+                <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" class="card-img-top" alt="{{ item.name }}">
+
+                <span class="badge bg-{{ item.type|lower == 'donate' and 'warning' or 'primary' }} position-absolute top-0 end-0 m-3 rounded-pill">
+                    <i class="fas {{ item.type|lower == 'donate' and 'fa-gift' or 'fa-share-alt' }} me-1"></i>
+                    {{ item.type|title }}
+                </span>
+            </div>
+            {% else %}
+            <div class="position-relative">
+                <i class="fas fa-image text-muted position-absolute top-0 end-0 m-3" style="font-size: 24px;"></i>
+            </div>
+            {% endif %}
+            <div class="card-body p-4">
+                <h5 class="card-title fw-bold mb-3">{{ item.name }}</h5>
+                <div class="card-text">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-tag text-muted me-2"></i>
+                        <span>{{ item.category }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                        <span>{{ item.location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-clock text-muted me-2"></i>
+                        <span>{{ item.datetime }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-user text-muted me-2"></i>
+                        <span>Posted by: {{ item.user.username }}</span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('approve', item_id=item.id) }}" class="btn btn-success rounded-pill flex-grow-1">
+                        <i class="fas fa-check me-2"></i>Approve
+                    </a>
+                    <button type="button" class="btn btn-danger rounded-pill flex-grow-1" data-bs-toggle="modal" data-bs-target="#rejectModal{{ item.id }}">
+                        <i class="fas fa-times me-2"></i>Reject
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reject Modal -->
+        <div class="modal fade" id="rejectModal{{ item.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Rejection</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to reject this item?</p>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            This action cannot be undone.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{{ url_for('reject', item_id=item.id) }}" class="btn btn-danger rounded-pill">
+                            <i class="fas fa-times me-2"></i>Reject Item
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card fade-in">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                <h3 class="h5 mb-3">All Clear!</h3>
+                <p class="text-muted mb-0">No pending items requiring approval.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add this right after the first navbar in admin_dashboard.html -->
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light rounded-pill mb-4 fade-in">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="adminNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#users">
+                            <i class="fas fa-users me-2"></i>Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#accessories">
+                            <i class="fas fa-box me-2"></i>Accessories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pending">
+                            <i class="fas fa-clock me-2"></i>Pending Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#borrows">
+                            <i class="fas fa-handshake me-2"></i>Borrows
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#returns">
+                            <i class="fas fa-undo me-2"></i>Returns
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#history">
+                            <i class="fas fa-history me-2"></i>History
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Database Overview Section -->
+    <div class="row">
+        <!-- Users Table -->
+        <div class="col-12 mb-4" id="users">
+            <div class="card fade-in">
+                <div class="card-header bg-white p-4">
+                    <h3 class="card-title h4 mb-0">
+                        <i class="fas fa-users me-2"></i>Users
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Created At</th>
+                                    <th>Items Listed</th>
+                                    <th>Items Borrowed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.username }}</td>
+                                    <td><span class="badge bg-{{ user.role == 'admin' and 'danger' or 'primary' }} rounded-pill">{{ user.role }}</span></td>
+                                    <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ user.approved_items|length }}</td>
+                                    <td>{{ user.borrowed_items|length }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accessories Table -->
+        <div class="col-12 mb-4" id="accessories">
+            <div class="card fade-in">
+                <div class="card-header bg-white p-4">
+                    <h3 class="card-title h4 mb-0">
+                        <i class="fas fa-box me-2"></i>Approved Accessories
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Location</th>
+                                    <th>Owner</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in approved_items %}
+                                <tr>
+                                    <td>{{ item.id }}</td>
+                                    <td>
+                                        {% if item.image %}
+                                            <img src="{{ url_for('static', filename=item.image) }}" 
+                                                 alt="{{ item.name }}" 
+                                                 class="admin-table-img rounded"
+                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                            <i class="fas fa-image text-muted"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.category }}</td>
+                                    <td><span class="badge bg-{{ item.type == 'donate' and 'warning' or 'primary' }} rounded-pill">{{ item.type }}</span></td>
+                                    <td>{{ item.location }}</td>
+                                    <td>{{ item.owner.username }}</td>
+                                    <td><span class="badge bg-{{ item.is_available and 'success' or 'danger' }} rounded-pill">{{ item.is_available and 'Available' or 'Borrowed' }}</span></td>
+                                    <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                </tr>
+
+                                <!-- Image Modal for each item -->
+                                <div class="modal fade" id="imageModal{{ item.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header border-0">
+                                                <h5 class="modal-title">{{ item.name }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-center p-0">
+                                                <img src="{{ url_for('static', filename=item.image) }}" 
+                                                     alt="{{ item.name }}"
+                                                     class="img-fluid rounded">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Borrowed Items Table -->
+        <div class="col-12 mb-4" id="borrows">
+            <div class="card fade-in">
+                <div class="card-header bg-white p-4">
+                    <h3 class="card-title h4 mb-0">
+                        <i class="fas fa-handshake me-2"></i>Borrowed Items
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Item</th>
+                                    <th>Borrower</th>
+                                    <th>Lender</th>
+                                    <th>Status</th>
+                                    <th>Pickup Location</th>
+                                    <th>Pickup Time</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for borrow in borrowed_items %}
+                                <tr>
+                                    <td>{{ borrow.id }}</td>
+                                    <td>{{ borrow.accessory.name }}</td>
+                                    <td>{{ borrow.borrower.username }}</td>
+                                    <td>{{ borrow.lender.username }}</td>
+                                    <td><span class="badge bg-{{ borrow.status == 'approved' and 'success' or 'warning' }} rounded-pill">{{ borrow.status }}</span></td>
+                                    <td>{{ borrow.pickup_location }}</td>
+                                    <td>{{ borrow.pickup_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ borrow.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Return Requests Table -->
+        <div class="col-12 mb-4" id="returns">
+            <div class="card fade-in">
+                <div class="card-header bg-white p-4">
+                    <h3 class="card-title h4 mb-0">
+                        <i class="fas fa-undo me-2"></i>Return Requests
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Item</th>
+                                    <th>Borrower</th>
+                                    <th>Lender</th>
+                                    <th>Status</th>
+                                    <th>Return Location</th>
+                                    <th>Return Time</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for return_req in return_requests %}
+                                <tr>
+                                    <td>{{ return_req.id }}</td>
+                                    <td>{{ return_req.item_name }}</td>
+                                    <td>{{ return_req.borrower.username }}</td>
+                                    <td>{{ return_req.lender.username }}</td>
+                                    <td><span class="badge bg-{{ return_req.status == 'approved' and 'success' or 'warning' }} rounded-pill">{{ return_req.status }}</span></td>
+                                    <td>{{ return_req.return_location }}</td>
+                                    <td>{{ return_req.return_datetime }}</td>
+                                    <td>{{ return_req.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Borrow History Table -->
+        <div class="col-12 mb-4" id="history">
+            <div class="card fade-in">
+                <div class="card-header bg-white p-4">
+                    <h3 class="card-title h4 mb-0">
+                        <i class="fas fa-history me-2"></i>Borrow History
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>Borrower</th>
+                                    <th>Lender</th>
+                                    <th>Borrow Date</th>
+                                    <th>Return Date</th>
+                                    <th>Locations</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for history in borrow_history %}
+                                <tr>
+                                    <td>{{ history.id }}</td>
+                                    <td>{{ history.item_name }}</td>
+                                    <td>{{ history.item_category }}</td>
+                                    <td>{{ history.borrower.username }}</td>
+                                    <td>{{ history.lender.username }}</td>
+                                    <td>{{ history.borrow_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ history.return_date.strftime('%Y-%m-%d %H:%M') if history.return_date else 'Not returned' }}</td>
+                                    <td>
+                                        <small class="d-block">Pickup: {{ history.pickup_location }}</small>
+                                        <small class="d-block">Return: {{ history.return_location or 'N/A' }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this CSS to your existing styles -->
+<style>
+    .navbar-nav .nav-link {
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        margin: 0 0.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .table th {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+    }
+
+    .admin-table-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .modal-dialog {
+        max-width: 800px;
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .modal-body img {
+        max-height: 80vh;
+        object-fit: contain;
+    }
+</style>
+
+<!-- Add this JavaScript for smooth scrolling -->
+<script>
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            // Update active state
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            this.classList.add('active');
+        }
+    });
+});
+</script>
+{% endblock %}

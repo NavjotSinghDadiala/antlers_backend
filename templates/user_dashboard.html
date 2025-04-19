@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard - Antlers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-5 fade-in fw-bold">Welcome, {{ current_user.username }}!</h1>
+            <p class="text-muted fade-in">Manage your items and requests</p>
+        </div>
+        <div class="d-flex gap-3 fade-in">
+            <a href="{{ url_for('borrow_requests') }}" class="btn btn-primary rounded-pill">
+                <i class="fas fa-hand-holding-usd me-2"></i>Borrow Requests
+            </a>
+            <a href="{{ url_for('return_requests') }}" class="btn btn-warning rounded-pill">
+                <i class="fas fa-undo me-2"></i>Return Requests
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-5 fade-in">
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4">
+                <div class="card-body">
+                    <i class="fas fa-hand-holding-usd fa-3x text-primary mb-3"></i>
+                    <h3 class="h5 mb-3">Borrow Items</h3>
+                    <p class="text-muted mb-4">Browse available items to borrow from the community.</p>
+                    <a href="{{ url_for('borrow') }}" class="btn btn-primary rounded-pill">
+                        <i class="fas fa-search me-2"></i>Browse Items
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4">
+                <div class="card-body">
+                    <i class="fas fa-share-alt fa-3x text-success mb-3"></i>
+                    <h3 class="h5 mb-3">Lend Items</h3>
+                    <p class="text-muted mb-4">Share your items with others in the community.</p>
+                    <a href="{{ url_for('lend') }}" class="btn btn-success rounded-pill">
+                        <i class="fas fa-plus me-2"></i>Add Item
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center p-4">
+                <div class="card-body">
+                    <i class="fas fa-gift fa-3x text-warning mb-3"></i>
+                    <h3 class="h5 mb-3">Donate Items</h3>
+                    <p class="text-muted mb-4">Give items to those who need them in the community.</p>
+                    <a href="{{ url_for('donate') }}" class="btn btn-warning rounded-pill">
+                        <i class="fas fa-gift me-2"></i>Donate
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Items Section -->
+    <div class="section-header fade-in">
+        <h2 class="fw-bold">My Items</h2>
+        <p class="text-muted">Items you've listed for lending or donation</p>
+    </div>
+    <div class="dashboard-grid">
+        {% for item in my_approved_items %}
+        <div class="card fade-in">
+            {% if item.image %}
+            <img src="{{ url_for('static', filename=item.image) }}" class="card-img-top" alt="{{ item.name }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ item.name }}</h5>
+                <div class="card-text">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-tag text-muted me-2"></i>
+                        <span>{{ item.category }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                        <span>{{ item.location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-clock text-muted me-2"></i>
+                        <span>{{ item.datetime }}</span>
+                    </div>
+                </div>
+                <span class="badge bg-success rounded-pill">
+                    <i class="fas fa-check me-1"></i>Approved
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Pending Items -->
+        {% for item in my_pending_items %}
+        <div class="card fade-in">
+            {% if item.image %}
+            <img src="{{ url_for('static', filename=item.image) }}" class="card-img-top" alt="{{ item.name }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ item.name }}</h5>
+                <div class="card-text">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-tag text-muted me-2"></i>
+                        <span>{{ item.category }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                        <span>{{ item.location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-clock text-muted me-2"></i>
+                        <span>{{ item.datetime }}</span>
+                    </div>
+                </div>
+                <span class="badge bg-warning rounded-pill">
+                    <i class="fas fa-clock me-1"></i>Pending Approval
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not my_approved_items and not my_pending_items %}
+        <div class="card fade-in">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <h3 class="h5 mb-3">No Items Yet</h3>
+                <p class="text-muted mb-4">You haven't listed any items for lending or donation.</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('lend') }}" class="btn btn-success rounded-pill">
+                        <i class="fas fa-plus me-2"></i>Add Item to Lend
+                    </a>
+                    <a href="{{ url_for('donate') }}" class="btn btn-warning rounded-pill">
+                        <i class="fas fa-gift me-2"></i>Add Item to Donate
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Borrowed Items Section -->
+    <div class="section-header fade-in mt-5">
+        <h2 class="fw-bold">Borrowed Items</h2>
+        <p class="text-muted">Items you're currently borrowing</p>
+    </div>
+    <div class="dashboard-grid">
+        {% for borrowed_item in borrowed_items %}
+        <div class="card fade-in">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">Item #{{ borrowed_item.accessory_id }}</h5>
+                <div class="card-text">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-user text-muted me-2"></i>
+                        <span>From: {{ borrowed_item.lender.username }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                        <span>{{ borrowed_item.pickup_location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-clock text-muted me-2"></i>
+                        <span>{{ borrowed_item.pickup_datetime }}</span>
+                    </div>
+                </div>
+                {% if borrowed_item.status == 'pending' %}
+                    <span class="badge bg-warning rounded-pill">
+                        <i class="fas fa-clock me-1"></i>Pending
+                    </span>
+                {% elif borrowed_item.status == 'approved' %}
+                    <div class="d-grid mt-3">
+                        <a href="{{ url_for('return_request', borrow_id=borrowed_item.id) }}" class="btn btn-primary rounded-pill">
+                            <i class="fas fa-undo me-2"></i>Return Item
+                        </a>
+                    </div>
+                {% else %}
+                    <span class="badge bg-danger rounded-pill">
+                        <i class="fas fa-times me-1"></i>Rejected
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card fade-in">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-0">No borrowed items found.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+{% endblock %}

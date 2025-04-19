@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Borrow Details - Antlers{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                {% if item.image %}
+                <img src="{{ url_for('static', filename=item.image) }}" class="card-img-top" alt="{{ item.name }}" style="height: 300px; width: 300px; object-fit: cover; margin: 0 auto; display: block;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text">
+                        <strong>Category:</strong> {{ item.category }}<br>
+                        <strong>Location:</strong> {{ item.location }}<br>
+                        <strong>Available:</strong> {{ item.datetime }}
+                    </p>
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="pickup_location" class="form-label">Pickup Location</label>
+                            <input type="text" class="form-control" id="pickup_location" name="pickup_location" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="pickup_datetime" class="form-label">Pickup Date and Time</label>
+                            <input type="datetime-local" class="form-control" id="pickup_datetime" name="pickup_datetime" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Submit Borrow Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

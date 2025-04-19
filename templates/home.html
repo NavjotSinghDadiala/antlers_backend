@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Antlers{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background -->
+<div class="hero-section text-center position-relative">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative">
+        <div class="hero-content">
+            <h1 class="display-3 mb-4 fade-in fw-bold text-white">Welcome to Antlers</h1>
+            <p class="lead mb-5 fade-in text-white">Share, Borrow, and Connect with Your Community</p>
+            {% if not current_user.is_authenticated %}
+                <div class="d-flex justify-content-center gap-3 fade-in">
+                    <a href="{{ url_for('login') }}" class="btn btn-light btn-lg rounded-pill">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg rounded-pill">
+                        <i class="fas fa-user-plus me-2"></i>Register
+                    </a>
+                </div>
+            {% else %}
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-light btn-lg rounded-pill">
+                    <i class="fas fa-columns me-2"></i>Go to Dashboard
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container features-section">
+    <div class="row mb-5">
+        <div class="col-md-4 fade-in">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon-wrapper mb-4">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <h3 class="h4 mb-3">Borrow</h3>
+                <p class="text-muted mb-4">Access the items you need without the commitment of ownership. Browse our community's shared collection.</p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('borrow') }}" class="btn btn-primary rounded-pill">
+                        <i class="fas fa-search me-2"></i>Browse Items
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4 fade-in">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon-wrapper mb-4">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <h3 class="h4 mb-3">Lend</h3>
+                <p class="text-muted mb-4">Share your items with others and earn while helping build a sustainable community.</p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('lend') }}" class="btn btn-success rounded-pill">
+                        <i class="fas fa-plus me-2"></i>List an Item
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4 fade-in">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon-wrapper mb-4">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h3 class="h4 mb-3">Donate</h3>
+                <p class="text-muted mb-4">Give your unused items a second life by donating them to those who need them most.</p>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('donate') }}" class="btn btn-warning rounded-pill">
+                        <i class="fas fa-heart me-2"></i>Donate Items
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Items Section -->
+    <div class="text-center mb-5">
+        <h2 class="section-title fade-in">Available Items</h2>
+        
+        <p class="text-muted fade-in">Discover what's available in your community</p>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="category-filter mb-4 fade-in">
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <button class="btn btn-outline-primary rounded-pill active" data-category="all">
+                <i class="fas fa-th-large me-2"></i>All
+            </button>
+            <button class="btn btn-outline-primary rounded-pill" data-category="earrings">
+                <i class="fas fa-gem me-2"></i>Earrings
+            </button>
+            <button class="btn btn-outline-primary rounded-pill" data-category="necklace">
+                <i class="fas fa-link me-2"></i>Necklace
+            </button>
+            <button class="btn btn-outline-primary rounded-pill" data-category="others">
+                <i class="fas fa-star me-2"></i>Others
+            </button>
+        </div>
+    </div>
+
+    <div class="items-grid">
+        {% for item in items %}
+        <div class="item-card fade-in" data-category="{{ item.category|lower }}">
+            <div class="card h-100">
+                {% if item.image %}
+                <div class="card-img-wrapper">
+                    
+                    <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" class="card-img-top" alt="{{ item.name }}">
+
+                    <div class="card-img-overlay d-flex align-items-start justify-content-end">
+                        <span class="badge bg-primary rounded-pill">
+                            <i class="fas fa-tag me-1"></i>{{ item.category }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ item.name }}</h5>
+                    <div class="card-text">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                            <span class="text-muted">{{ item.location }}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-clock text-primary me-2"></i>
+                            <span class="text-muted">{{ item.datetime }}</span>
+                        </div>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                        <div class="d-grid">
+                            <a href="{{ url_for('borrow_item', item_id=item.id) }}" class="btn btn-primary rounded-pill">
+                                <i class="fas fa-hand-holding-usd me-2"></i>Borrow Now
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info rounded-pill text-center mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Please login to borrow
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="card fade-in">
+                <div class="card-body text-center p-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h3 class="h5 mb-3">No Items Available</h3>
+                    <p class="text-muted mb-0">Check back later for new items!</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="how-it-works-section py-5 mt-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title fade-in">How It Works</h2>
+            <p class="text-muted fade-in">Simple steps to start sharing and borrowing</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3 fade-in">
+                <div class="step-card text-center">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h4>Sign Up</h4>
+                    <p class="text-muted">Create your free account to join our community</p>
+                </div>
+            </div>
+            <div class="col-md-3 fade-in">
+                <div class="step-card text-center">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h4>Browse Items</h4>
+                    <p class="text-muted">Find what you need from our collection</p>
+                </div>
+            </div>
+            <div class="col-md-3 fade-in">
+                <div class="step-card text-center">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h4>Request & Connect</h4>
+                    <p class="text-muted">Send a request and arrange the details</p>
+                </div>
+            </div>
+            <div class="col-md-3 fade-in">
+                <div class="step-card text-center">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4>Share & Enjoy</h4>
+                    <p class="text-muted">Pick up the item and enjoy using it</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1584302179602-e4c3d3fd629d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+        /* Alternative images you can try:
+        https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0 (Jewelry display)
+        https://images.unsplash.com/photo-1535632066927-ab7c9ab60908 (Elegant jewelry)
+        https://images.unsplash.com/photo-1515562141207-7a88fb7ce338 (Jewelry collection)
+        https://images.unsplash.com/photo-1573408301185-9146fe634ad0 (Modern jewelry display)
+        */
+    /* Hero Section */
+
+    
+    background-size: cover;
+    background-position: center;
+    padding: 8rem 0;
+    margin-top: -2rem;
+    margin-bottom: 4rem;
+    position: relative;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(147, 112, 219, 0.8), /* Purple */
+        rgba(233, 30, 99, 0.8)    /* Pink */
+    );
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Features Section */
+.features-section {
+    margin-top: -4rem;
+    position: relative;
+    z-index: 2;
+}
+
+.feature-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 2rem;
+}
+
+.feature-card:nth-child(1) .feature-icon-wrapper {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196F3;
+}
+
+.feature-card:nth-child(2) .feature-icon-wrapper {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+}
+
+.feature-card:nth-child(3) .feature-icon-wrapper {
+    background: rgba(255, 152, 0, 0.1);
+    color: #FF9800;
+}
+
+/* Items Grid */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.card-img-wrapper {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.item-card:hover .card-img-wrapper img {
+    transform: scale(1.05);
+}
+
+/* How It Works Section */
+.how-it-works-section {
+    background-color: #f8f9fa;
+}
+
+.step-card {
+    padding: 2rem;
+    position: relative;
+}
+
+.step-number {
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    font-size: 4rem;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.1);
+    line-height: 1;
+}
+
+.step-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+/* Category Filter */
+.category-filter .btn {
+    min-width: 120px;
+}
+
+.category-filter .btn.active {
+    background-color: #2196F3;
+    color: white;
+    border-color: #2196F3;
+}
+
+.category-filter .btn i {
+    font-size: 1.2rem;
+}
+
+/* Extra Styles */
+.fade-in {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Custom Button Styles */
+.btn-rounded-pill {
+    border-radius: 50px;
+    padding: 12px 30px;
+}
+
+.btn-outline-light, .btn-light, .btn-outline-primary, .btn-primary, .btn-outline-success, .btn-success, .btn-outline-warning, .btn-warning {
+    font-size: 1.1rem;
+    padding: 12px 30px;
+}
+
+.card-body .btn-primary, .card-body .btn-success, .card-body .btn-warning {
+    font-size: 1rem;
+    margin-top: 10px;
+}
+
+/* Card Text */
+.card-body .card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-body .card-text {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+.card-body .card-text .text-muted {
+    font-size: 0.9rem;
+}
+
+/* Alert Box */
+.alert-info {
+    font-size: 1rem;
+}
+
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Category filter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterButtons = document.querySelectorAll('.category-filter button');
+        const items = document.querySelectorAll('.item-card');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.getAttribute('data-category');
+                
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Filter items
+                items.forEach(item => {
+                    if (category === 'all' || item.getAttribute('data-category') === category) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Return Requests - Antlers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-5 fade-in fw-bold">Return Requests</h1>
+            <p class="text-muted fade-in">Manage your item returns</p>
+        </div>
+        <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-primary rounded-pill fade-in">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Pending Returns Section -->
+    <div class="section-header fade-in mb-4">
+        <h2 class="fw-bold">Pending Returns</h2>
+        <p class="text-muted">Returns waiting for approval</p>
+    </div>
+    <div class="dashboard-grid">
+        {% for return_request in pending_returns %}
+        <div class="card fade-in">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title fw-bold mb-0">{{ return_request.item_name if return_request.item_name else "Item" }}</h5>
+                    <span class="badge bg-warning rounded-pill">Pending</span>
+                </div>
+                <div class="card-text">
+                    {% if current_user.id == return_request.lender_id %}
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-user text-muted me-2"></i>
+                            <span>Returned by: {{ return_request.borrower.username }}</span>
+                        </div>
+                    {% else %}
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-user text-muted me-2"></i>
+                            <span>Returning to: {{ return_request.lender.username }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                        <span>Return at: {{ return_request.return_location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-location-arrow text-muted me-2"></i>
+                        <span>Pickup at: {{ return_request.pickup_location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-clock text-muted me-2"></i>
+                        <span>{{ return_request.return_datetime }}</span>
+                    </div>
+                    {% if return_request.return_notes %}
+                        <div class="alert alert-info rounded-pill mb-3">
+                            <i class="fas fa-info-circle me-2"></i>{{ return_request.return_notes }}
+                        </div>
+                    {% endif %}
+                </div>
+                {% if current_user.id == return_request.lender_id %}
+                    <div class="d-flex gap-2">
+                        <form action="{{ url_for('approve_return', return_id=return_request.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-success rounded-pill">
+                                <i class="fas fa-check me-2"></i>Approve
+                            </button>
+                        </form>
+                        <form action="{{ url_for('reject_return', return_id=return_request.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger rounded-pill">
+                                <i class="fas fa-times me-2"></i>Reject
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card fade-in">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-0">No pending return requests.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Approved Returns Section -->
+    <div class="section-header fade-in mb-4 mt-5">
+        <h2 class="fw-bold">Approved Returns</h2>
+        <p class="text-muted">Successfully completed returns</p>
+    </div>
+    <div class="dashboard-grid">
+        {% for return_request in approved_returns %}
+        <div class="card fade-in">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title fw-bold mb-0">{{ return_request.item_name if return_request.item_name else "Item" }}</h5>
+                    <span class="badge bg-success rounded-pill">Approved</span>
+                </div>
+                <div class="card-text">
+                    {% if current_user.id == return_request.lender_id %}
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-user text-muted me-2"></i>
+                            <span>Returned by: {{ return_request.borrower.username }}</span>
+                        </div>
+                    {% else %}
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-user text-muted me-2"></i>
+                            <span>Returned to: {{ return_request.lender.username }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                        <span>Returned at: {{ return_request.return_location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-location-arrow text-muted me-2"></i>
+                        <span>Picked up at: {{ return_request.pickup_location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-clock text-muted me-2"></i>
+                        <span>{{ return_request.return_datetime }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card fade-in">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-0">No approved return requests.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 
