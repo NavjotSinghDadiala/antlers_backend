@@ -3,440 +3,662 @@
 {% block title %}Home - Antlers{% endblock %}
 
 {% block content %}
-<!-- Hero Section with Background -->
-<div class="hero-section text-center position-relative">
-    <div class="hero-overlay"></div>
-    <div class="container position-relative">
-        <div class="hero-content">
-            <h1 class="display-3 mb-4 fade-in fw-bold text-white">Welcome to Antlers</h1>
-            <p class="lead mb-5 fade-in text-white">Share, Borrow, and Connect with Your Community</p>
-            {% if not current_user.is_authenticated %}
-                <div class="d-flex justify-content-center gap-3 fade-in">
-                    <a href="{{ url_for('login') }}" class="btn btn-light btn-lg rounded-pill">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login
-                    </a>
-                    <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg rounded-pill">
-                        <i class="fas fa-user-plus me-2"></i>Register
-                    </a>
-                </div>
-            {% else %}
-                <a href="{{ url_for('user_dashboard') }}" class="btn btn-light btn-lg rounded-pill">
+<!-- Hero Section with Parallax Effect -->
+<section class="hero-section" id="hero">
+    <div class="hero-content">
+        <h1 class="display-1 text-white mb-4 animate-pop-in">Discover <span class="text-accent">Antlers</span></h1>
+        <p class="lead text-white mb-5 animate-pop-in">The community-driven platform for sharing and borrowing outdoor gear</p>
+        
+        <div class="d-flex justify-content-center flex-wrap gap-3">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary btn-lg rounded-pill px-4 py-2 shadow-sm">
                     <i class="fas fa-columns me-2"></i>Go to Dashboard
+                </a>
+            {% endif %}
+            
+            <a href="{{ url_for('what_we_offer') }}" class="btn btn-outline-light btn-lg rounded-pill px-4 py-2">
+                <i class="fas fa-info-circle me-2"></i>What We Offer
+            </a>
+            <a href="{{ url_for('how_it_works') }}" class="btn btn-outline-light btn-lg rounded-pill px-4 py-2">
+                <i class="fas fa-question-circle me-2"></i>How It Works
+            </a>
+        </div>
+    </div>
+    
+    <div class="hero-scroll-indicator">
+        <a href="#available-items" class="text-white">
+            <div class="scroll-icon">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <span>Explore Items</span>
+        </a>
+    </div>
+</section>
+
+<!-- Available Items Section with Depth Effect -->
+<div id="available-items" class="section py-5">
+    <div class="container py-4" data-depth="0.15">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <div class="section-header">
+                    <span class="section-subheading">Our Collection</span>
+                    <h2 class="section-title display-5 fw-bold mb-2 fade-in">Available Items</h2>
+                    <div class="coffee-divider">
+                        <span></span><i class="fas fa-mug-hot"></i><span></span>
+                    </div>
+                    <p class="text-muted mb-5 fade-in">Browse our collection of items shared by community members</p>
+                </div>
+                
+                <!-- Category Filter -->
+                <div class="mb-5 fade-in">
+                    <div class="filter-container d-flex justify-content-center gap-2 flex-wrap category-filter-buttons">
+                        <button class="filter-btn active" data-category="all">
+                            <i class="fas fa-th-large me-2"></i>All
+                        </button>
+                        <button class="filter-btn" data-category="earrings">
+                            <i class="fas fa-gem me-2"></i>Earrings
+                        </button>
+                        <button class="filter-btn" data-category="necklace">
+                            <i class="fas fa-link me-2"></i>Necklace
+                        </button>
+                        <button class="filter-btn" data-category="others">
+                            <i class="fas fa-star me-2"></i>Others
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="item-grid">
+            {% for item in items %}
+            <div class="fade-in" data-category="{{ item.category|lower }}" data-depth="{{ 0.1 + loop.index0 * 0.02 }}">
+                <div class="card h-100 border-0 shadow-sm item-card">
+                    <div class="card-img-wrapper">
+                        {% if item.image %}
+                        <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" class="card-img-top" alt="{{ item.name }}">
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge rounded-pill bg-accent px-3 py-2 shadow-sm">
+                                <i class="fas fa-tag me-1"></i>{{ item.category }}
+                            </span>
+                        </div>
+                        {% else %}
+                        <div class="no-image-placeholder d-flex align-items-center justify-content-center">
+                            <i class="fas fa-image text-muted fa-3x"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-3">{{ item.name }}</h5>
+                        <div class="card-text">
+                            <div class="d-flex align-items-center mb-2 text-muted">
+                                <div class="icon-circle me-2">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <span>{{ item.location }}</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3 text-muted">
+                                <div class="icon-circle me-2">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <span>{{ item.datetime }}</span>
+                            </div>
+                        </div>
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('borrow_item', item_id=item.id) }}" class="btn btn-primary w-100 rounded-pill">
+                                <i class="fas fa-hand-holding-usd me-2"></i>Borrow Now
+                            </a>
+                        {% else %}
+                            <div class="login-prompt p-3 rounded bg-soft-accent border text-center">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                <a href="{{ url_for('login') }}" class="text-decoration-none">Login</a> or 
+                                <a href="{{ url_for('register') }}" class="text-decoration-none">Register</a> to borrow
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="empty-state card fade-in border-0 shadow-sm p-5 text-center">
+                    <div class="empty-state-icon mb-4">
+                        <i class="fas fa-box-open fa-4x text-muted opacity-50"></i>
+                    </div>
+                    <h3 class="h4 mb-3">No Items Available</h3>
+                    <p class="text-muted mb-4">Check back later for new items or be the first to list something!</p>
+                    {% if current_user.is_authenticated %}
+                    <div class="text-center">
+                        <a href="{{ url_for('lend') }}" class="btn btn-outline-primary rounded-pill px-4">
+                            <i class="fas fa-plus-circle me-2"></i>List an Item
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Call to Action -->
+        <div class="cta-container text-center mt-5 pt-5 fade-in">
+            <h3 class="mb-4">Ready to share your items with the community?</h3>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('lend') }}" class="btn btn-primary btn-lg rounded-pill px-4 py-2 shadow-sm">
+                    <i class="fas fa-share-alt me-2"></i>Lend an Item
+                </a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-accent btn-lg rounded-pill px-4 py-2 shadow-sm">
+                    <i class="fas fa-user-plus me-2"></i>Join Antlers
                 </a>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Features Section -->
-<div class="container features-section">
-    <div class="row mb-5">
-        <div class="col-md-4 fade-in">
-            <div class="feature-card text-center p-4">
-                <div class="feature-icon-wrapper mb-4">
-                    <i class="fas fa-hand-holding-usd"></i>
-                </div>
-                <h3 class="h4 mb-3">Borrow</h3>
-                <p class="text-muted mb-4">Access the items you need without the commitment of ownership. Browse our community's shared collection.</p>
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('borrow') }}" class="btn btn-primary rounded-pill">
-                        <i class="fas fa-search me-2"></i>Browse Items
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-        <div class="col-md-4 fade-in">
-            <div class="feature-card text-center p-4">
-                <div class="feature-icon-wrapper mb-4">
-                    <i class="fas fa-share-alt"></i>
-                </div>
-                <h3 class="h4 mb-3">Lend</h3>
-                <p class="text-muted mb-4">Share your items with others and earn while helping build a sustainable community.</p>
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('lend') }}" class="btn btn-success rounded-pill">
-                        <i class="fas fa-plus me-2"></i>List an Item
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-        <div class="col-md-4 fade-in">
-            <div class="feature-card text-center p-4">
-                <div class="feature-icon-wrapper mb-4">
-                    <i class="fas fa-gift"></i>
-                </div>
-                <h3 class="h4 mb-3">Donate</h3>
-                <p class="text-muted mb-4">Give your unused items a second life by donating them to those who need them most.</p>
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('donate') }}" class="btn btn-warning rounded-pill">
-                        <i class="fas fa-heart me-2"></i>Donate Items
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Available Items Section -->
-    <div class="text-center mb-5">
-        <h2 class="section-title fade-in">Available Items</h2>
-        
-        <p class="text-muted fade-in">Discover what's available in your community</p>
-    </div>
-
-    <!-- Category Filter -->
-    <div class="category-filter mb-4 fade-in">
-        <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <button class="btn btn-outline-primary rounded-pill active" data-category="all">
-                <i class="fas fa-th-large me-2"></i>All
-            </button>
-            <button class="btn btn-outline-primary rounded-pill" data-category="earrings">
-                <i class="fas fa-gem me-2"></i>Earrings
-            </button>
-            <button class="btn btn-outline-primary rounded-pill" data-category="necklace">
-                <i class="fas fa-link me-2"></i>Necklace
-            </button>
-            <button class="btn btn-outline-primary rounded-pill" data-category="others">
-                <i class="fas fa-star me-2"></i>Others
-            </button>
-        </div>
-    </div>
-
-    <div class="items-grid">
-        {% for item in items %}
-        <div class="item-card fade-in" data-category="{{ item.category|lower }}">
-            <div class="card h-100">
-                {% if item.image %}
-                <div class="card-img-wrapper">
-                    
-                    <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" class="card-img-top" alt="{{ item.name }}">
-
-                    <div class="card-img-overlay d-flex align-items-start justify-content-end">
-                        <span class="badge bg-primary rounded-pill">
-                            <i class="fas fa-tag me-1"></i>{{ item.category }}
-                        </span>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">{{ item.name }}</h5>
-                    <div class="card-text">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
-                            <span class="text-muted">{{ item.location }}</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="fas fa-clock text-primary me-2"></i>
-                            <span class="text-muted">{{ item.datetime }}</span>
-                        </div>
-                    </div>
-                    {% if current_user.is_authenticated %}
-                        <div class="d-grid">
-                            <a href="{{ url_for('borrow_item', item_id=item.id) }}" class="btn btn-primary rounded-pill">
-                                <i class="fas fa-hand-holding-usd me-2"></i>Borrow Now
-                            </a>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info rounded-pill text-center mb-0">
-                            <i class="fas fa-info-circle me-2"></i>Please login to borrow
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="col-12">
-            <div class="card fade-in">
-                <div class="card-body text-center p-5">
-                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                    <h3 class="h5 mb-3">No Items Available</h3>
-                    <p class="text-muted mb-0">Check back later for new items!</p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
-<!-- How It Works Section -->
-<div class="how-it-works-section py-5 mt-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title fade-in">How It Works</h2>
-            <p class="text-muted fade-in">Simple steps to start sharing and borrowing</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-3 fade-in">
-                <div class="step-card text-center">
-                    <div class="step-number">1</div>
-                    <div class="step-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h4>Sign Up</h4>
-                    <p class="text-muted">Create your free account to join our community</p>
-                </div>
-            </div>
-            <div class="col-md-3 fade-in">
-                <div class="step-card text-center">
-                    <div class="step-number">2</div>
-                    <div class="step-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h4>Browse Items</h4>
-                    <p class="text-muted">Find what you need from our collection</p>
-                </div>
-            </div>
-            <div class="col-md-3 fade-in">
-                <div class="step-card text-center">
-                    <div class="step-number">3</div>
-                    <div class="step-icon">
-                        <i class="fas fa-handshake"></i>
-                    </div>
-                    <h4>Request & Connect</h4>
-                    <p class="text-muted">Send a request and arrange the details</p>
-                </div>
-            </div>
-            <div class="col-md-3 fade-in">
-                <div class="step-card text-center">
-                    <div class="step-number">4</div>
-                    <div class="step-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h4>Share & Enjoy</h4>
-                    <p class="text-muted">Pick up the item and enjoy using it</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% block extra_css %}
 <style>
-    /* Hero Section */
-    .hero-section {
-        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1584302179602-e4c3d3fd629d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-        /* Alternative images you can try:
-        https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0 (Jewelry display)
-        https://images.unsplash.com/photo-1535632066927-ab7c9ab60908 (Elegant jewelry)
-        https://images.unsplash.com/photo-1515562141207-7a88fb7ce338 (Jewelry collection)
-        https://images.unsplash.com/photo-1573408301185-9146fe634ad0 (Modern jewelry display)
-        */
-    /* Hero Section */
-
+    /* Hero section with gradient overlay */
+    .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        background-color: #121212;
+        color: #ffffff;
+    }
     
-    background-size: cover;
-    background-position: center;
-    padding: 8rem 0;
-    margin-top: -2rem;
-    margin-bottom: 4rem;
-    position: relative;
-}
-
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(147, 112, 219, 0.8), /* Purple */
-        rgba(233, 30, 99, 0.8)    /* Pink */
-    );
-}
-
-.hero-content {
-    position: relative;
-    z-index: 1;
-}
-
-/* Features Section */
-.features-section {
-    margin-top: -4rem;
-    position: relative;
-    z-index: 2;
-}
-
-.feature-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 100%;
-    transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-}
-
-.feature-icon-wrapper {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    font-size: 2rem;
-}
-
-.feature-card:nth-child(1) .feature-icon-wrapper {
-    background: rgba(33, 150, 243, 0.1);
-    color: #2196F3;
-}
-
-.feature-card:nth-child(2) .feature-icon-wrapper {
-    background: rgba(76, 175, 80, 0.1);
-    color: #4CAF50;
-}
-
-.feature-card:nth-child(3) .feature-icon-wrapper {
-    background: rgba(255, 152, 0, 0.1);
-    color: #FF9800;
-}
-
-/* Items Grid */
-.items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-bottom: 4rem;
-}
-
-.card-img-wrapper {
-    height: 200px;
-    overflow: hidden;
-    position: relative;
-}
-
-.card-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.item-card:hover .card-img-wrapper img {
-    transform: scale(1.05);
-}
-
-/* How It Works Section */
-.how-it-works-section {
-    background-color: #f8f9fa;
-}
-
-.step-card {
-    padding: 2rem;
-    position: relative;
-}
-
-.step-number {
-    position: absolute;
-    top: 0;
-    right: 1rem;
-    font-size: 4rem;
-    font-weight: bold;
-    color: rgba(0, 0, 0, 0.1);
-    line-height: 1;
-}
-
-.step-icon {
-    font-size: 2.5rem;
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
-}
-
-/* Category Filter */
-.category-filter .btn {
-    min-width: 120px;
-}
-
-.category-filter .btn.active {
-    background-color: #2196F3;
-    color: white;
-    border-color: #2196F3;
-}
-
-.category-filter .btn i {
-    font-size: 1.2rem;
-}
-
-/* Extra Styles */
-.fade-in {
-    animation: fadeIn 1s ease-in-out;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(18,18,18,0.8) 100%);
+        z-index: 1;
     }
-    100% {
-        opacity: 1;
+    
+    /* Community Sharing Themed Hero Section */
+    .hero-section {
+        background-color: #121212;
+        background-image: 
+            url("{{ url_for('static', filename='assets/images/antlers1.jpg') }}"),
+            linear-gradient(rgba(18, 18, 18, 0.6), rgba(18, 18, 18, 0.7));
+        background-blend-mode: soft-light;
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
     }
-}
+    
+    .hero-shapes {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+    }
+    
+    /* Replace geometric shapes with community-themed icons */
+    .coffee-bean {
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 2rem;
+        transform: rotate(0deg);
+        transition: all 0.3s ease;
+    }
+    
+    .coffee-bean::before {
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+    }
+    
+    .coffee-bean-1 {
+        width: 120px;
+        height: 120px;
+        top: 15%;
+        left: 10%;
+        animation: float 15s ease-in-out infinite alternate;
+    }
+    .coffee-bean-1::before {
+        content: "\f4dd"; /* fa-hands-helping */
+    }
+    
+    .coffee-bean-2 {
+        width: 150px;
+        height: 150px;
+        bottom: 20%;
+        right: 10%;
+        animation: float 18s ease-in-out infinite alternate-reverse;
+    }
+    .coffee-bean-2::before {
+        content: "\f1b2"; /* fa-cube */
+    }
+    
+    .coffee-bean-3 {
+        width: 100px;
+        height: 100px;
+        top: 60%;
+        right: 20%;
+        animation: float 12s ease-in-out infinite alternate;
+    }
+    .coffee-bean-3::before {
+        content: "\f772"; /* fa-recycle */
+    }
+    
+    .coffee-bean-4 {
+        width: 130px;
+        height: 130px;
+        bottom: 30%;
+        left: 15%;
+        animation: float 20s ease-in-out infinite alternate-reverse;
+    }
+    .coffee-bean-4::before {
+        content: "\f4da"; /* fa-hand-holding-heart */
+    }
+    
+    /* Add animated connecting lines - representing community connections */
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            linear-gradient(30deg, transparent 98%, rgba(255, 255, 255, 0.1) 99%),
+            linear-gradient(60deg, transparent 98%, rgba(255, 255, 255, 0.1) 99%),
+            linear-gradient(120deg, transparent 98%, rgba(255, 255, 255, 0.1) 99%),
+            linear-gradient(150deg, transparent 98%, rgba(255, 255, 255, 0.1) 99%);
+        background-size: 60px 60px;
+        background-position: 0 0;
+        opacity: 0.3;
+    }
+    
+    /* Create a vignette effect around the edges */
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.5) 100%);
+        pointer-events: none;
+    }
+    
+    @keyframes float {
+        0% {
+            transform: translateY(0) rotate(0deg);
+        }
+        50% {
+            transform: translateY(15px) rotate(5deg);
+        }
+        100% {
+            transform: translateY(5px) rotate(-5deg);
+        }
+    }
 
-/* Custom Button Styles */
-.btn-rounded-pill {
-    border-radius: 50px;
-    padding: 12px 30px;
-}
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        padding: 0 2rem;
+        background-color: rgba(18, 18, 18, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 20px;
+        padding: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-title {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        text-shadow: 0 2px 15px rgba(0, 0, 0, 0.5);
+        position: relative;
+        display: inline-block;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Add a highlight under the title */
+    .hero-title::after {
+        content: '';
+        position: absolute;
+        width: 120px;
+        height: 4px;
+        background-color: #4D8AE0;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 2px;
+        box-shadow: 0 0 10px rgba(77, 138, 224, 0.5);
+    }
+    
+    .hero-subtitle {
+        font-weight: 300;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        margin-top: 20px;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1.35rem;
+    }
+    
+    .hero-scroll-indicator {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        animation: bounce 2s infinite;
+        z-index: 5;
+    }
+    
+    .scroll-icon {
+        border: 2px solid #4D8AE0;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        box-shadow: 0 0 15px rgba(77, 138, 224, 0.5);
+        background-color: rgba(18, 18, 18, 0.7);
+    }
+    
+    .hero-scroll-indicator a {
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .hero-scroll-indicator a:hover {
+        opacity: 0.9;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0) translateX(-50%);
+        }
+        40% {
+            transform: translateY(-20px) translateX(-50%);
+        }
+        60% {
+            transform: translateY(-10px) translateX(-50%);
+        }
+    }
+    
+    /* Section styles */
+    .section {
+        padding: 5rem 0;
+        background-color: var(--background-light);
+    }
+    
+    .section-header {
+        margin-bottom: 2rem;
+    }
+    
+    .section-subheading {
+        font-size: 1rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: var(--accent-color);
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1rem;
+        color: var(--primary-color-dark);
+    }
+    
+    .coffee-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 1rem auto 2rem;
+        max-width: 320px;
+    }
+    
+    .coffee-divider span {
+        flex-grow: 1;
+        height: 1px;
+        background-color: var(--accent-color);
+        opacity: 0.5;
+    }
+    
+    .coffee-divider i {
+        padding: 0 15px;
+        color: var(--accent-color);
+        font-size: 1.2rem;
+    }
+    
+    /* Category filter buttons */
+    .filter-container {
+        padding: 0.5rem;
+        border-radius: 50px;
+        background-color: rgba(190, 155, 123, 0.1);
+        display: inline-flex;
+    }
+    
+    .filter-btn {
+        background: none;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        font-weight: 500;
+        color: var(--text-color-light);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .filter-btn:hover {
+        background-color: rgba(190, 155, 123, 0.2);
+    }
+    
+    .filter-btn.active {
+        background-color: var(--accent-color);
+        color: white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Item grid */
+    .item-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    
+    /* Card styling */
+    .item-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #fff;
+    }
+    
+    .item-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        height: 200px;
+    }
+    
+    .card-img-top {
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .item-card:hover .card-img-top {
+        transform: scale(1.1);
+    }
+    
+    .no-image-placeholder {
+        height: 100%;
+        background-color: var(--accent-color-light);
+    }
+    
+    .icon-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: rgba(190, 155, 123, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: var(--accent-color);
+    }
+    
+    /* Empty state styling */
+    .empty-state {
+        border-radius: 12px;
+        background-color: white;
+    }
+    
+    .empty-state-icon {
+        display: inline-block;
+        color: var(--accent-color);
+    }
+    
+    /* CTA section */
+    .cta-container {
+        padding: 3rem 0 1rem;
+    }
+    
+    /* Background Colors */
+    .bg-soft-accent {
+        background-color: rgba(190, 155, 123, 0.1);
+    }
 
-.btn-outline-light, .btn-light, .btn-outline-primary, .btn-primary, .btn-outline-success, .btn-success, .btn-outline-warning, .btn-warning {
-    font-size: 1.1rem;
-    padding: 12px 30px;
-}
+    /* Button styling specifically for the hero section */
+    .hero-section .btn-primary {
+        background-color: #4D8AE0;
+        border-color: #4D8AE0;
+        color: #FFFFFF;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(77, 138, 224, 0.4);
+    }
 
-.card-body .btn-primary, .card-body .btn-success, .card-body .btn-warning {
-    font-size: 1rem;
-    margin-top: 10px;
-}
+    .hero-section .btn-primary:hover,
+    .hero-section .btn-primary:focus {
+        background-color: #3a7fd8;
+        border-color: #3a7fd8;
+        box-shadow: 0 0 20px rgba(77, 138, 224, 0.6);
+        transform: translateY(-3px);
+    }
 
-/* Card Text */
-.card-body .card-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-}
+    .hero-section .btn-outline-light {
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        transition: all 0.3s ease;
+    }
 
-.card-body .card-text {
-    font-size: 1rem;
-    color: #6c757d;
-}
-
-.card-body .card-text .text-muted {
-    font-size: 0.9rem;
-}
-
-/* Alert Box */
-.alert-info {
-    font-size: 1rem;
-}
-
+    .hero-section .btn-outline-light:hover,
+    .hero-section .btn-outline-light:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.8);
+        transform: translateY(-3px);
+    }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Category filter functionality
+    // Smooth scroll
     document.addEventListener('DOMContentLoaded', function() {
-        const filterButtons = document.querySelectorAll('.category-filter button');
-        const items = document.querySelectorAll('.item-card');
-
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const category = button.getAttribute('data-category');
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
                 
-                // Update active button
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-
-                // Filter items
-                items.forEach(item => {
-                    if (category === 'all' || item.getAttribute('data-category') === category) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
+        
+        // Enhanced parallax effects for mouse movement
+        window.addEventListener('mousemove', function(e) {
+            if (window.innerWidth <= 768) return;
+            
+            const mouseX = e.clientX / window.innerWidth - 0.5;
+            const mouseY = e.clientY / window.innerHeight - 0.5;
+            
+            // Subtle parallax effect on cards based on mouse movement
+            document.querySelectorAll('.card').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                
+                // Only apply to cards in view
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    const offsetX = mouseX * 10;
+                    const offsetY = mouseY * 10;
+                    card.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                }
+            });
+            
+            // Subtle movement of coffee beans
+            document.querySelectorAll('.coffee-bean').forEach((bean, index) => {
+                const depth = 0.05 + (index * 0.02);
+                const rotateBase = index % 2 === 0 ? 45 : 55;
+                bean.style.transform = `translateX(${mouseX * 50 * depth}px) translateY(${mouseY * 50 * depth}px) rotate(${rotateBase + mouseX * 5}deg)`;
+            });
+        });
+        
+        // Initialize each card with its own parallax depth
+        document.querySelectorAll('[data-depth]').forEach(element => {
+            updateElementOnScroll(element);
+        });
+        
+        // Filter functionality removed - now only using the one from main.js
     });
+    
+    function updateElementOnScroll(element) {
+        const depth = parseFloat(element.getAttribute('data-depth') || 0.1);
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset;
+            const elementTop = element.offsetTop;
+            const scrollDistance = scrollTop - elementTop;
+            
+            if (Math.abs(scrollDistance) < window.innerHeight * 1.5) {
+                const translateY = scrollDistance * depth * 0.1;
+                element.style.transform = `translateY(${translateY}px)`;
+            }
+        });
+    }
 </script>
 {% endblock %}
 {% endblock %}

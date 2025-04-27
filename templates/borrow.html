@@ -3,66 +3,66 @@
 {% block title %}Borrow Items - Antlers{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="display-5 fw-bold fade-in">Available Items</h1>
-                    <p class="text-muted fade-in">Browse items available for borrowing</p>
-                </div>
-                <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-primary rounded-pill fade-in">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-                </a>
-            </div>
+<!-- Borrow Hero Parallax Section -->
+<div class="parallax-section" style="height: 50vh;">
+    <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');" data-speed="0.2"></div>
+    <div class="content-wrapper">
+        <div class="text-center">
+            <h1 class="section-title fade-in">Available Items</h1>
+            <p class="mb-4 fade-in">Browse items available for borrowing in your community</p>
+            <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline mb-3 fade-in">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
         </div>
     </div>
+</div>
 
-    <div class="row">
-        {% for item in items %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 fade-in">
-                {% if item.image %}
-                <div class="card-img-wrapper position-relative">
+<!-- Items Section -->
+<div class="section">
+    <div class="container">
+        <div class="item-grid">
+            {% for item in items %}
+            <div class="fade-in">
+                <div class="card h-100">
+                    {% if item.image %}
                     <img src="{{ url_for('static', filename=item.image) }}" class="card-img-top" alt="{{ item.name }}">
-                    <div class="category-badge position-absolute top-0 end-0 m-3">
-                        <span class="badge bg-primary rounded-pill">{{ item.category }}</span>
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-primary">{{ item.category }}</span>
                     </div>
-                </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title fw-bold mb-3">{{ item.name }}</h5>
-                    <div class="card-text">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
-                            <span>{{ item.location }}</span>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <div class="card-text">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                <span>{{ item.location }}</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-clock text-primary me-2"></i>
+                                <span>{{ item.datetime }}</span>
+                            </div>
                         </div>
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="fas fa-clock text-muted me-2"></i>
-                            <span>{{ item.datetime }}</span>
-                        </div>
-                    </div>
-                    <div class="d-grid">
-                        <a href="{{ url_for('borrow_item', item_id=item.id) }}" class="btn btn-primary rounded-pill">
+                        <a href="{{ url_for('borrow_item', item_id=item.id) }}" class="btn btn-primary w-100">
                             <i class="fas fa-hand-holding-usd me-2"></i>Borrow Now
                         </a>
                     </div>
                 </div>
             </div>
-        </div>
-        {% else %}
-        <div class="col-12">
-            <div class="card fade-in">
-                <div class="card-body text-center p-5">
-                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                    <h3 class="h5 mb-3">No Items Available</h3>
-                    <p class="text-muted mb-0">Check back later for new items to borrow.</p>
+            {% else %}
+            <div class="col-12">
+                <div class="card fade-in">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                        <h3 class="h5 mb-3">No Items Available</h3>
+                        <p class="mb-0">Check back later for new items to borrow.</p>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -81,5 +81,4 @@
         z-index: 1;
     }
 </style>
-{% endblock %}
 {% endblock %}

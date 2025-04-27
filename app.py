@@ -13,7 +13,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'  # Use forward slash instead of os.path.join
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL') or 'sqlite:///antlers.db'
 app.config['SECRET_KEY'] = environ.get('SECRET_KEY') or 'secretkey'
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'  
 
 # Ensure upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -136,10 +136,24 @@ def create_tables_and_admin():
         db.session.commit()
 
 @app.route('/')
+def main():
+    return render_template('main.html')
+
+@app.route('/home')
 def home():
     # Only show items that are available
     items = Accessory.query.filter_by(is_available=True).all()
     return render_template('home.html', items=items)
+
+@app.route('/what-we-offer')
+def what_we_offer():
+    """Render the 'What We Offer' page"""
+    return render_template('what_we_offer.html')
+
+@app.route('/how-it-works')
+def how_it_works():
+    """Render the 'How It Works' page"""
+    return render_template('how_it_works.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

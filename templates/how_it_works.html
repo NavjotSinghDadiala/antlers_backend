@@ -1,0 +1,489 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works - Antlers{% endblock %}
+
+{% block content %}
+<!-- Simple Hero Section -->
+<div class="simple-hero py-5">
+    <div class="container py-4 text-center">
+        <h1 class="display-4 fw-bold mb-3">How It Works</h1>
+        <p class="lead mb-0">Learn how to use the Antlers platform in a few simple steps</p>
+    </div>
+</div>
+
+<!-- Timeline/Flowchart Section -->
+<div class="section py-5">
+    <div class="container py-4">
+        <div class="timeline">
+            <div class="timeline-item left fade-in">
+                <div class="timeline-content shadow-sm">
+                    <div class="timeline-marker"></div>
+                    <h3>Create Your Account</h3>
+                    <p class="text-muted">Sign up for a free account on Antlers. Fill in your profile with accurate information so other users can trust you in the community.</p>
+                    <a href="{{ url_for('register') }}" class="btn btn-sm btn-primary rounded-pill mt-2">Register Now</a>
+                </div>
+            </div>
+            
+            <div class="timeline-item right fade-in delay-1">
+                <div class="timeline-content shadow-sm">
+                    <div class="timeline-marker"></div>
+                    <h3>Choose Your Path</h3>
+                    <div class="role-options mt-3">
+                        <div class="role-option p-3 mb-2 bg-soft-accent rounded">
+                            <strong class="d-block mb-1"><i class="fas fa-search me-2 text-primary"></i>As a Borrower:</strong>
+                            <p class="mb-0 small text-muted">Browse available items in the community to find what you need.</p>
+                        </div>
+                        <div class="role-option p-3 mb-2 bg-soft-accent rounded">
+                            <strong class="d-block mb-1"><i class="fas fa-share-alt me-2 text-primary"></i>As a Lender:</strong>
+                            <p class="mb-0 small text-muted">List items you're willing to share temporarily.</p>
+                        </div>
+                        <div class="role-option p-3 mb-2 bg-soft-accent rounded">
+                            <strong class="d-block mb-1"><i class="fas fa-gift me-2 text-primary"></i>As a Donor:</strong>
+                            <p class="mb-0 small text-muted">Submit items you want to donate permanently.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item left fade-in delay-2">
+                <div class="timeline-content shadow-sm">
+                    <div class="timeline-marker"></div>
+                    <h3>Admin Approval</h3>
+                    <p class="text-muted">When you list an item for lending or donation, our admin team reviews it first. This ensures quality and safety for all users. You'll be notified once your item is approved.</p>
+                    <div class="alert alert-light border mt-3 small shadow-sm">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        <strong>Note:</strong> Most items are approved within 24 hours.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item right fade-in delay-3">
+                <div class="timeline-content shadow-sm">
+                    <div class="timeline-marker"></div>
+                    <h3>Borrowing Process</h3>
+                    <p class="text-muted">Find an item you need, send a request with your preferred pickup time and location. The owner will review and approve your request, then you can arrange to collect the item.</p>
+                    <div class="process-steps mt-3">
+                        <div class="step d-flex align-items-center mb-2">
+                            <span class="step-number">1</span>
+                            <span class="step-text">Find item and send request</span>
+                        </div>
+                        <div class="step d-flex align-items-center mb-2">
+                            <span class="step-number">2</span>
+                            <span class="step-text">Receive approval from owner</span>
+                        </div>
+                        <div class="step d-flex align-items-center">
+                            <span class="step-number">3</span>
+                            <span class="step-text">Arrange pickup details</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item left fade-in delay-4">
+                <div class="timeline-content shadow-sm">
+                    <div class="timeline-marker"></div>
+                    <h3>Lending Process</h3>
+                    <p class="text-muted">After your item is approved, borrowers can send requests. You can review each request and decide who to lend to. Arrange pickup details through our secure platform.</p>
+                    <div class="process-steps mt-3">
+                        <div class="step d-flex align-items-center mb-2">
+                            <span class="step-number">1</span>
+                            <span class="step-text">List item and wait for approval</span>
+                        </div>
+                        <div class="step d-flex align-items-center mb-2">
+                            <span class="step-number">2</span>
+                            <span class="step-text">Receive and review borrowing requests</span>
+                        </div>
+                        <div class="step d-flex align-items-center">
+                            <span class="step-number">3</span>
+                            <span class="step-text">Approve request and arrange handover</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item right fade-in delay-5">
+                <div class="timeline-content shadow-sm">
+                    <div class="timeline-marker"></div>
+                    <h3>Return & Feedback</h3>
+                    <p class="text-muted">When the borrowing period ends, the item is returned to the owner in the same condition. Both parties can leave feedback to build trust in the community.</p>
+                    <div class="feedback-example p-3 mt-3 border rounded text-center bg-soft-accent">
+                        <i class="fas fa-star text-accent"></i>
+                        <i class="fas fa-star text-accent"></i>
+                        <i class="fas fa-star text-accent"></i>
+                        <i class="fas fa-star text-accent"></i>
+                        <i class="fas fa-star text-accent"></i>
+                        <p class="mb-0 mt-2 small font-italic">"Great transaction! Item was in perfect condition and the owner was very helpful."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple CTA -->
+<div class="simple-cta py-5">
+    <div class="container py-3 text-center">
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg rounded-pill px-4 me-3">Create Account</a>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-primary btn-lg rounded-pill px-4">Browse Items</a>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    /* Clean, Simple Styling */
+    :root {
+        --timeline-line: #5294e2;
+        --timeline-marker: #5294e2;
+        --step-number: #5294e2;
+        --accent-color: #ffcc50;
+        --text-primary: #222222;
+        --text-secondary: #444444;
+        --card-bg: #ffffff;
+        --card-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        --card-border: 1px solid rgba(0, 0, 0, 0.05);
+        --bg-dark: #121212;
+        --bg-accent: rgba(245, 189, 65, 0.15);
+    }
+    
+    /* Universal Styling - Dark mode as default */
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+        background-color: var(--bg-dark);
+        color: #ffffff;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 600;
+        color: #ffffff;
+    }
+    
+    .simple-hero {
+        background-color: #000000;
+        color: #ffffff;
+    }
+    
+    .simple-hero h1 {
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .simple-hero p {
+        color: #ffffff;
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    .section {
+        background-color: var(--bg-dark);
+    }
+    
+    .simple-cta {
+        background-color: #000000;
+    }
+    
+    .btn-primary {
+        background-color: var(--timeline-line);
+        border-color: var(--timeline-line);
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(58, 123, 213, 0.3);
+    }
+    
+    .btn-outline-primary {
+        color: #ffffff;
+        border-color: var(--timeline-line);
+        font-weight: 600;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--timeline-line);
+        color: #fff;
+    }
+    
+    /* Timeline/Flowchart Styling */
+    .timeline {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 0;
+    }
+    
+    .timeline::after {
+        content: '';
+        position: absolute;
+        width: 4px;
+        background-color: var(--timeline-line);
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        margin-left: -2px;
+        border-radius: 2px;
+    }
+    
+    .timeline-item {
+        padding: 10px 40px;
+        position: relative;
+        width: 50%;
+        box-sizing: border-box;
+        margin-bottom: 30px;
+    }
+    
+    .timeline-content {
+        padding: 25px;
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+        border: var(--card-border);
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .timeline-content:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .timeline-content h3 {
+        margin-top: 0;
+        color: #111111;
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+    
+    .timeline-content p {
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: #000000;
+        font-weight: 600;
+    }
+    
+    .timeline-content .text-muted,
+    .timeline-content p.text-muted {
+        color: #000000 !important;
+        font-weight: 600;
+        opacity: 0.85;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: var(--timeline-marker);
+        border-radius: 50%;
+        border: 4px solid var(--card-bg);
+        box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.3);
+        z-index: 1;
+    }
+    
+    .left {
+        left: 0;
+    }
+    
+    .right {
+        left: 50%;
+    }
+    
+    .left .timeline-marker {
+        right: -50px;
+    }
+    
+    .right .timeline-marker {
+        left: -50px;
+    }
+    
+    .left .timeline-content::after {
+        content: '';
+        position: absolute;
+        border: 10px solid transparent;
+        border-left-color: var(--card-bg);
+        right: -20px;
+        top: 20px;
+    }
+    
+    .right .timeline-content::after {
+        content: '';
+        position: absolute;
+        border: 10px solid transparent;
+        border-right-color: var(--card-bg);
+        left: -20px;
+        top: 20px;
+    }
+    
+    /* Process steps */
+    .process-steps {
+        padding-left: 10px;
+        margin-top: 1.2rem;
+    }
+    
+    .step {
+        font-size: 1.05rem;
+        margin-bottom: 12px !important;
+    }
+    
+    .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background-color: var(--step-number);
+        color: white;
+        border-radius: 50%;
+        font-size: 0.9rem;
+        font-weight: bold;
+        margin-right: 12px;
+    }
+    
+    .step-text {
+        color: #000000;
+        font-weight: 600;
+    }
+    
+    .text-muted {
+        color: #000000 !important;
+        font-weight: 600;
+    }
+    
+    .text-primary {
+        color: var(--timeline-line) !important;
+    }
+    
+    .bg-soft-accent {
+        background-color: rgba(245, 189, 65, 0.15);
+        border: 1px solid rgba(245, 189, 65, 0.3);
+    }
+    
+    .role-option {
+        margin-bottom: 10px;
+    }
+    
+    .role-option strong {
+        color: #000000;
+        font-weight: 700;
+        font-size: 1.05rem;
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+    
+    .role-option p.small {
+        color: #000000 !important;
+        font-weight: 600;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 0;
+    }
+    
+    .text-accent {
+        color: var(--accent-color) !important;
+    }
+    
+    .alert-light {
+        background-color: rgba(255, 255, 255, 0.3);
+        color: #000000;
+        border-color: rgba(58, 123, 213, 0.3);
+        font-weight: 600;
+    }
+    
+    .alert-light strong {
+        color: #000000;
+    }
+    
+    .feedback-example {
+        background-color: rgba(245, 189, 65, 0.2) !important;
+    }
+    
+    .feedback-example p {
+        color: #000000 !important;
+        font-weight: 600;
+        font-style: italic;
+    }
+    
+    .timeline-content i.fas {
+        color: var(--timeline-line);
+    }
+    
+    /* Animation utility */
+    .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    
+    .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+    
+    /* Dark mode overrides - removed as we're now using dark theme by default */
+    
+    /* Light mode overrides - removed as we're defaulting to dark mode for this page */
+    
+    /* Responsive timeline */
+    @media screen and (max-width: 768px) {
+        .timeline::after {
+            left: 31px;
+        }
+        
+        .timeline-item {
+            width: 100%;
+            padding-left: 70px;
+            padding-right: 15px;
+        }
+        
+        .timeline-item.right {
+            left: 0;
+        }
+        
+        .left .timeline-marker, .right .timeline-marker {
+            left: 20px;
+        }
+        
+        .left .timeline-content::after, .right .timeline-content::after {
+            left: -20px;
+            border-right-color: var(--card-bg);
+            border-left-color: transparent;
+        }
+        
+        .timeline-content h3 {
+            font-size: 1.2rem;
+        }
+        
+        .simple-hero h1 {
+            font-size: 2rem;
+        }
+        
+        .simple-hero p {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add fade-in animations as elements come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.fade-in').forEach(item => {
+            observer.observe(item);
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 
