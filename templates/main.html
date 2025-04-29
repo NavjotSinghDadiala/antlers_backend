@@ -8,6 +8,113 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/materialdesignicons.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/animate.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}">
+        <style>
+            /* Additional responsive styles */
+            @media (max-width: 992px) {
+                .navbar-brand h1 {
+                    font-size: 1.5rem;
+                }
+                
+                .home-bg h1.header_title {
+                    font-size: 1.8rem !important;
+                }
+                
+                .home-bg h4 {
+                    font-size: 1.1rem;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .navbar-brand h1 {
+                    font-size: 1.3rem;
+                }
+                
+                .home-bg h1.header_title {
+                    font-size: 1.5rem !important;
+                }
+                
+                .home-bg h4 {
+                    font-size: 1rem;
+                }
+                
+                .social_home li {
+                    margin: 0 5px;
+                }
+                
+                .btn-outline-custom {
+                    padding: 8px 16px;
+                    font-size: 0.9rem;
+                }
+            }
+            
+            @media (max-width: 576px) {
+                .navbar-brand h1 {
+                    font-size: 1.2rem;
+                }
+                
+                .home-bg h1.header_title {
+                    font-size: 1.3rem !important;
+                }
+                
+                .home-bg h4 {
+                    font-size: 0.9rem;
+                }
+                
+                .social_home li {
+                    margin: 0 3px;
+                }
+                
+                .btn-outline-custom {
+                    padding: 6px 12px;
+                    font-size: 0.8rem;
+                }
+                
+                .section.h-100vh {
+                    min-height: 100vh !important;
+                    height: auto !important;
+                }
+                
+                .z-index {
+                    padding: 30px 15px;
+                }
+            }
+            
+            .navbar-toggler {
+                border: none;
+                padding: 0;
+            }
+            
+            .navbar-toggler:focus {
+                box-shadow: none;
+            }
+            
+            .mdi-menu {
+                font-size: 24px;
+            }
+            
+            /* Ensure the navbar collapse properly on mobile */
+            .navbar-collapse {
+                transition: all 0.3s ease;
+            }
+            
+            /* Make sure buttons and links are easy to tap on mobile */
+            .navbar-nav .nav-link, 
+            .btn, 
+            .social_home li a {
+                padding: 10px;
+                display: inline-block;
+            }
+            
+            @media (max-width: 992px) {
+                .navbar-nav {
+                    padding-top: 15px;
+                }
+                
+                .navbar-nav .nav-item {
+                    margin-bottom: 5px;
+                }
+            }
+        </style>
     </head>
 
     <body>
@@ -17,7 +124,7 @@
                 <a class='navbar-brand logo' href='{{ url_for('main') }}'>
                     <h1>ANTLERS</h1>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="mdi mdi-menu"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">

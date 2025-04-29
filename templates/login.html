@@ -1,49 +1,250 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        /* author: Ecem Gokdogan
+https://codepen.io/ecemgo/pen/Baqpbez */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
 
-{% block title %}Login - Antlers{% endblock %}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'poppins',sans-serif;
+}
 
-{% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card fade-in p-4">
-                <div class="text-center mb-4">
-                    <i class="fas fa-paw fa-3x text-primary mb-3"></i>
-                    <h2 class="fw-bold">Welcome Back</h2>
-                    <p class="text-muted">Sign in to your Antlers account</p>
-                </div>
-                <form method="POST" action="{{ url_for('login') }}" class="needs-validation" novalidate>
-                    <div class="mb-4">
-                        <label for="username" class="form-label">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-user text-muted"></i>
-                            </span>
-                            <input type="text" class="form-control border-start-0" id="username" name="username" required>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="form-label">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-lock text-muted"></i>
-                            </span>
-                            <input type="password" class="form-control border-start-0" id="password" name="password" required>
-                        </div>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg rounded-pill">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
-                        </button>
-                    </div>
-                </form>
-                <div class="text-center mt-4">
-                    <p class="text-muted">Don't have an account? 
-                        <a href="{{ url_for('register') }}" class="text-primary text-decoration-none">Register here</a>
-                    </p>
-                </div>
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-image: url("{{ url_for('static', filename='assets/images/antlers2.jpg') }}");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Adjust transparency here */
+  z-index: 1;
+}
+
+section {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    backdrop-filter: blur(55px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    z-index: 2; /* Ensure section is above the overlay */
+}
+
+@media (max-width: 768px) {
+    section {
+        width: 85%;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    section {
+        width: 90%;
+        padding: 1.2rem;
+    }
+}
+
+h1 {
+    font-size: 2rem;
+    color: #fff;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.7rem;
+    }
+}
+
+.inputbox {
+    position: relative;
+    margin: 30px 0;
+    width: 100%;
+    max-width: 310px;
+    border-bottom: 2px solid #fff;
+}
+
+.inputbox label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: all 0.5s ease-in-out;
+}
+
+@media (max-width: 480px) {
+    .inputbox label {
+        font-size: 0.9rem;
+    }
+}
+
+input:focus ~ label, 
+input:valid ~ label {
+    top: -5px;
+}
+
+.inputbox input {
+    width: 100%;
+    height: 60px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 0 35px 0 5px;
+    color: #fff;
+}
+
+@media (max-width: 480px) {
+    .inputbox input {
+        height: 50px;
+        font-size: 0.9rem;
+    }
+}
+
+.inputbox ion-icon {
+    position: absolute;
+    right: 8px;
+    color: #fff;
+    font-size: 1.2rem;
+    top: 20px;
+}
+
+@media (max-width: 480px) {
+    .inputbox ion-icon {
+        top: 15px;
+        font-size: 1rem;
+    }
+}
+
+.forget {
+    margin: 35px 0;
+    font-size: 0.85rem;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+}
+
+.forget label {
+    display: flex;
+    align-items: center;
+}
+
+.forget label input {
+    margin-right: 3px;
+}
+
+.forget a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.forget a:hover {
+    text-decoration: underline;
+}
+
+button {
+    width: 100%;
+    height: 40px;
+    border-radius: 40px;
+    background-color: rgb(255, 255,255, 1);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.4s ease;
+}
+
+button:hover {
+  background-color: rgb(255, 255,255, 0.5);
+}
+
+.register {
+    font-size: 0.9rem;
+    color: #fff;
+    text-align: center;
+    margin: 25px 0 10px;
+}
+
+@media (max-width: 480px) {
+    .register {
+        font-size: 0.8rem;
+    }
+}
+
+.register p a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+}
+
+.register p a:hover {
+    text-decoration: underline;
+}
+
+form {
+    width: 100%;
+}
+    </style>
+    <title>Login - Antlers</title>
+</head>
+
+<body>
+    <section>
+        <form action="{{ url_for('login') }}" method="POST">
+            <h1>Login</h1>
+
+            <div class="inputbox">
+                <ion-icon name="person-outline"></ion-icon>
+                <input type="text" name="username" required>
+                <label>Username</label>
             </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+
+            <div class="inputbox">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" name="password" required>
+                <label>Password</label>
+            </div>
+
+
+            <button type="submit">Log in</button>
+
+            <div class="register">
+                <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+            </div>
+        </form>
+    </section>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

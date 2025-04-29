@@ -75,7 +75,12 @@
                 <div class="card h-100 border-0 shadow-sm item-card">
                     <div class="card-img-wrapper">
                         {% if item.image %}
-                        <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" class="card-img-top" alt="{{ item.name }}">
+                        <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" 
+                             class="card-img-top" 
+                             alt="{{ item.name }}"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#imageModal{{ item.id }}"
+                             style="cursor: pointer;">
                         <div class="position-absolute top-0 end-0 m-2">
                             <span class="badge rounded-pill bg-accent px-3 py-2 shadow-sm">
                                 <i class="fas fa-tag me-1"></i>{{ item.category }}
@@ -115,6 +120,26 @@
                             </div>
                         {% endif %}
                     </div>
+                    
+                    <!-- Image Modal -->
+                    {% if item.image %}
+                    <div class="modal fade" id="imageModal{{ item.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title">{{ item.name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-0 text-center">
+                                    <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" 
+                                         class="img-fluid" 
+                                         alt="{{ item.name }}"
+                                         style="max-height: 80vh; width: auto;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% else %}
@@ -513,6 +538,7 @@
     
     .card-img-top {
         height: 100%;
+        width: 100%;
         object-fit: cover;
         transition: transform 0.5s ease;
     }
@@ -551,14 +577,61 @@
     
     /* CTA section */
     .cta-container {
-        padding: 3rem 0 1rem;
+        padding: 2rem;
+        position: relative;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        margin-top: 3rem;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .cta-container h3 {
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color-dark);
+    }
+    
+    /* Updated Button Styling */
+    .item-card .btn-primary {
+        background-color: #E8745B; /* Coral red color */
+        border-color: #E8745B;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 8px rgba(232, 116, 91, 0.2);
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .item-card .btn-primary:hover {
+        transform: translateY(-3px);
+        background-color: #db6248;
+        border-color: #db6248;
+        box-shadow: 0 6px 12px rgba(232, 116, 91, 0.3);
+    }
+    
+    .cta-container .btn-primary {
+        background-color: #7E57C2; /* Purple */
+        border-color: #7E57C2;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 8px rgba(126, 87, 194, 0.2);
+        border: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .cta-container .btn-primary:hover {
+        transform: translateY(-3px);
+        background-color: #6A48B0;
+        border-color: #6A48B0;
+        box-shadow: 0 6px 12px rgba(126, 87, 194, 0.3);
     }
     
     /* Background Colors */
     .bg-soft-accent {
         background-color: rgba(190, 155, 123, 0.1);
     }
-
+    
     /* Button styling specifically for the hero section */
     .hero-section .btn-primary {
         background-color: #4D8AE0;
@@ -567,7 +640,7 @@
         transition: all 0.3s ease;
         box-shadow: 0 0 15px rgba(77, 138, 224, 0.4);
     }
-
+    
     .hero-section .btn-primary:hover,
     .hero-section .btn-primary:focus {
         background-color: #3a7fd8;
@@ -575,12 +648,12 @@
         box-shadow: 0 0 20px rgba(77, 138, 224, 0.6);
         transform: translateY(-3px);
     }
-
+    
     .hero-section .btn-outline-light {
         border: 2px solid rgba(255, 255, 255, 0.5);
         transition: all 0.3s ease;
     }
-
+    
     .hero-section .btn-outline-light:hover,
     .hero-section .btn-outline-light:focus {
         background-color: rgba(255, 255, 255, 0.1);
@@ -618,19 +691,7 @@
             const mouseX = e.clientX / window.innerWidth - 0.5;
             const mouseY = e.clientY / window.innerHeight - 0.5;
             
-            // Subtle parallax effect on cards based on mouse movement
-            document.querySelectorAll('.card').forEach(card => {
-                const rect = card.getBoundingClientRect();
-                
-                // Only apply to cards in view
-                if (rect.top < window.innerHeight && rect.bottom > 0) {
-                    const offsetX = mouseX * 10;
-                    const offsetY = mouseY * 10;
-                    card.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-                }
-            });
-            
-            // Subtle movement of coffee beans
+            // Only animate the decorative elements
             document.querySelectorAll('.coffee-bean').forEach((bean, index) => {
                 const depth = 0.05 + (index * 0.02);
                 const rotateBase = index % 2 === 0 ? 45 : 55;
@@ -642,8 +703,6 @@
         document.querySelectorAll('[data-depth]').forEach(element => {
             updateElementOnScroll(element);
         });
-        
-        // Filter functionality removed - now only using the one from main.js
     });
     
     function updateElementOnScroll(element) {

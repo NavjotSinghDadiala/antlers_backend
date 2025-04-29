@@ -585,28 +585,7 @@
                     </li>
                     
                     {% if current_user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-concierge-bell me-1"></i>Services
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="servicesDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('borrow') }}">
-                                        <i class="fas fa-hand-holding-usd me-2"></i>Borrow
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('lend') }}">
-                                        <i class="fas fa-share-alt me-2"></i>Lend
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ url_for('donate') }}">
-                                        <i class="fas fa-gift me-2"></i>Donate
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        <!-- Services dropdown removed -->
                         
                         {% if current_user.role == 'admin' %}
                             <li class="nav-item">

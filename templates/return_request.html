@@ -2,6 +2,34 @@
 
 {% block title %}Return Item - Antlers{% endblock %}
 
+{% block extra_css %}
+<style>
+    .card-img-container {
+        overflow: hidden;
+        height: 180px;
+        background-color: #f8f9fa;
+        position: relative;
+    }
+    
+    .card-img-top {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+        cursor: pointer;
+    }
+    
+    .card-img-container:hover .card-img-top {
+        transform: scale(1.05);
+    }
+    
+    .badge.bg-accent {
+        background-color: var(--accent-color, #E8745B);
+        color: white;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
     <div class="row justify-content-center">
@@ -12,10 +40,46 @@
                     <h2 class="mb-2">Return Item Request</h2>
                     <p class="mb-0">Please provide the return details below</p>
                 </div>
+                
+                <!-- Item details with image -->
+                {% if borrowed_item.accessory and borrowed_item.accessory.image %}
+                <div class="card-img-container">
+                    <img src="{{ url_for('static', filename=borrowed_item.accessory.image.replace('\\', '/')) }}" 
+                         class="card-img-top" 
+                         alt="{{ borrowed_item.accessory.name if borrowed_item.accessory else 'Item #' + borrowed_item.accessory_id|string }}"
+                         data-bs-toggle="modal" 
+                         data-bs-target="#itemImageModal">
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge rounded-pill bg-accent px-3 py-2 shadow-sm">
+                            <i class="fas fa-tag me-1"></i>{{ borrowed_item.accessory.category if borrowed_item.accessory else 'Item' }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                
                 <div class="card-body p-4">
-                    <form action="{{ url_for('return_item', item_id=borrowed_item.id) }}" method="POST" class="needs-validation" novalidate>
+                    <!-- Item summary -->
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <h5 class="fw-bold mb-3">
+                            {% if borrowed_item.accessory %}
+                            {{ borrowed_item.accessory.name }}
+                            {% else %}
+                            Item #{{ borrowed_item.accessory_id }}
+                            {% endif %}
+                        </h5>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-user text-muted me-2"></i>
+                            <span>From: {{ borrowed_item.lender_user.username }}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-calendar text-muted me-2"></i>
+                            <span>Borrowed on: {{ borrowed_item.pickup_datetime.strftime('%d %b %Y, %I:%M %p') if borrowed_item.pickup_datetime else borrowed_item.pickup_datetime }}</span>
+                        </div>
+                    </div>
+                    
+                    <form action="{{ url_for('return_item', item_id=borrowed_item.id) }}" method="POST">
                         <div class="mb-4">
-                            <label for="return_location" class="form-label">Return Location</label>
+                            <label for="return_location" class="form-label">Return Location <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light">
                                     <i class="fas fa-map-marker-alt text-primary"></i>
@@ -25,19 +89,11 @@
                             <div class="form-text">Please specify where you will return the item.</div>
                         </div>
 
-                        <div class="mb-4">
-                            <label for="pickup_location" class="form-label">Pickup Location for Lender</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light">
-                                    <i class="fas fa-location-arrow text-primary"></i>
-                                </span>
-                                <input type="text" class="form-control" id="pickup_location" name="pickup_location" required>
-                            </div>
-                            <div class="form-text">Please specify where the lender should pick up the item.</div>
-                        </div>
+                        <!-- Hidden pickup location field -->
+                        <input type="hidden" name="pickup_location" value="{{ borrowed_item.pickup_location }}">
 
                         <div class="mb-4">
-                            <label for="return_datetime" class="form-label">Return Date and Time</label>
+                            <label for="return_datetime" class="form-label">Return Date and Time <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light">
                                     <i class="fas fa-calendar text-primary"></i>
@@ -73,22 +129,49 @@
     </div>
 </div>
 
+<!-- Image Modal -->
+{% if borrowed_item.accessory and borrowed_item.accessory.image %}
+<div class="modal fade" id="itemImageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    {% if borrowed_item.accessory %}
+                    {{ borrowed_item.accessory.name }}
+                    {% else %}
+                    Item #{{ borrowed_item.accessory_id }}
+                    {% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 text-center">
+                <img src="{{ url_for('static', filename=borrowed_item.accessory.image.replace('\\', '/')) }}" 
+                     class="img-fluid" 
+                     alt="{{ borrowed_item.accessory.name if borrowed_item.accessory else 'Item #' + borrowed_item.accessory_id|string }}"
+                     style="max-height: 80vh; width: auto;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block extra_js %}
 <script>
-    // Form validation
-    (function () {
-        'use strict'
-        var forms = document.querySelectorAll('.needs-validation')
-        Array.prototype.slice.call(forms).forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault()
-                    event.stopPropagation()
-                }
-                form.classList.add('was-validated')
-            }, false)
-        })
-    })()
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Return form initialized');
+        
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                console.log('Form validation failed');
+            } else {
+                console.log('Form submission started');
+            }
+            form.classList.add('was-validated');
+        });
+    });
 </script>
-{% endblock %}
 {% endblock %} 

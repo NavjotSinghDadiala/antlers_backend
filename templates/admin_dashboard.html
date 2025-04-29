@@ -120,8 +120,12 @@
         <div class="card fade-in">
             {% if item.image %}
             <div class="position-relative">
-                <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" class="card-img-top" alt="{{ item.name }}">
-
+                <a href="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" target="_blank">
+                    <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" 
+                         class="card-img-top" 
+                         alt="{{ item.name }}"
+                         style="height: 200px; object-fit: cover;">
+                </a>
                 <span class="badge bg-{{ item.type|lower == 'donate' and 'warning' or 'primary' }} position-absolute top-0 end-0 m-3 rounded-pill">
                     <i class="fas {{ item.type|lower == 'donate' and 'fa-gift' or 'fa-share-alt' }} me-1"></i>
                     {{ item.type|title }}
@@ -141,16 +145,30 @@
                     </div>
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-map-marker-alt text-muted me-2"></i>
-                        <span>{{ item.location }}</span>
+                        <span>Pickup: {{ item.location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-home text-muted me-2"></i>
+                        <span>Residence: {{ item.residence }}</span>
                     </div>
                     <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-clock text-muted me-2"></i>
-                        <span>{{ item.datetime }}</span>
+                        <span>Available: {{ item.datetime.strftime('%Y-%m-%d %H:%M') }}</span>
                     </div>
-                    <div class="d-flex align-items-center mb-3">
+                    <div class="d-flex align-items-center mb-2">
                         <i class="fas fa-user text-muted me-2"></i>
                         <span>Posted by: {{ item.user.username }}</span>
                     </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-phone text-muted me-2"></i>
+                        <span>Contact: {{ item.user.contact_number }}</span>
+                    </div>
+                    {% if item.description %}
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="fas fa-info-circle text-muted me-2 mt-1"></i>
+                        <span>Description: {{ item.description }}</span>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="d-flex gap-2">
                     <a href="{{ url_for('approve', item_id=item.id) }}" class="btn btn-success rounded-pill flex-grow-1">
@@ -193,6 +211,68 @@
                 <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
                 <h3 class="h5 mb-3">All Clear!</h3>
                 <p class="text-muted mb-0">No pending items requiring approval.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Return Requests Section -->
+    <div class="section-header fade-in mb-4 mt-5">
+        <h2 class="fw-bold">Return Requests</h2>
+        <p class="text-muted">Monitor item return processes</p>
+    </div>
+    
+    <div class="dashboard-grid">
+        {% for return_request in return_requests %}
+        <div class="card fade-in">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title fw-bold mb-0">{{ return_request.item_name }}</h5>
+                    <span class="badge bg-{{ return_request.status == 'pending' and 'warning' or (return_request.status == 'approved' and 'info' or 'success') }} rounded-pill">
+                        {{ return_request.status|title }}
+                    </span>
+                </div>
+                <div class="card-text">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-user text-muted me-2"></i>
+                        <span>Lender: {{ return_request.lender.username }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-user text-muted me-2"></i>
+                        <span>Borrower: {{ return_request.borrower.username }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                        <span>Return at: {{ return_request.return_location }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-calendar-alt text-muted me-2"></i>
+                        <span>Created: {{ return_request.created_at.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                    
+                    <!-- Confirmation Status -->
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <span class="badge {% if return_request.lender_confirmed_return %}bg-success{% else %}bg-secondary{% endif %} me-2">
+                                <i class="fas {% if return_request.lender_confirmed_return %}fa-check-circle{% else %}fa-circle{% endif %} me-1"></i>
+                                Lender Confirmed
+                            </span>
+                        </div>
+                        <div>
+                            <span class="badge {% if return_request.borrower_confirmed_return %}bg-success{% else %}bg-secondary{% endif %}">
+                                <i class="fas {% if return_request.borrower_confirmed_return %}fa-check-circle{% else %}fa-circle{% endif %} me-1"></i>
+                                Borrower Confirmed
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card fade-in">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-0">No return requests to display.</p>
             </div>
         </div>
         {% endfor %}

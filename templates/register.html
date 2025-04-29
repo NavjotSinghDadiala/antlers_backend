@@ -1,50 +1,265 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        /* author: Ecem Gokdogan
+https://codepen.io/ecemgo/pen/Baqpbez */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
 
-{% block title %}Register - Antlers{% endblock %}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'poppins',sans-serif;
+}
 
-{% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card fade-in p-4">
-                <div class="text-center mb-4">
-                    <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
-                    <h2 class="fw-bold">Create Account</h2>
-                    <p class="text-muted">Join the Antlers community today</p>
-                </div>
-                <form method="POST" action="{{ url_for('register') }}" class="needs-validation" novalidate>
-                    <div class="mb-4">
-                        <label for="username" class="form-label">Choose a Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-user text-muted"></i>
-                            </span>
-                            <input type="text" class="form-control border-start-0" id="username" name="username" required>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="form-label">Create Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-lock text-muted"></i>
-                            </span>
-                            <input type="password" class="form-control border-start-0" id="password" name="password" required>
-                        </div>
-                        <div class="form-text">Password must be at least 6 characters long</div>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg rounded-pill">
-                            <i class="fas fa-user-plus me-2"></i>Create Account
-                        </button>
-                    </div>
-                </form>
-                <div class="text-center mt-4">
-                    <p class="text-muted">Already have an account? 
-                        <a href="{{ url_for('login') }}" class="text-primary text-decoration-none">Login here</a>
-                    </p>
-                </div>
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-image: url("{{ url_for('static', filename='assets/images/antlers3.jpg') }}");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Adjust transparency here */
+  z-index: 1;
+}
+
+section {
+    position: relative;
+    width: 90%;
+    max-width: 450px;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    backdrop-filter: blur(55px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    z-index: 2; /* Ensure section is above the overlay */
+}
+
+@media (max-width: 768px) {
+    section {
+        width: 85%;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    section {
+        width: 90%;
+        padding: 1.2rem;
+    }
+}
+
+h1 {
+    font-size: 2rem;
+    color: #fff;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.7rem;
+    }
+}
+
+.inputbox {
+    position: relative;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 310px;
+    border-bottom: 2px solid #fff;
+}
+
+.inputbox label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: all 0.5s ease-in-out;
+}
+
+@media (max-width: 480px) {
+    .inputbox label {
+        font-size: 0.9rem;
+    }
+}
+
+input:focus ~ label, 
+input:valid ~ label {
+    top: -5px;
+}
+
+.inputbox input {
+    width: 100%;
+    height: 60px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 0 35px 0 5px;
+    color: #fff;
+}
+
+@media (max-width: 480px) {
+    .inputbox input {
+        height: 50px;
+        font-size: 0.9rem;
+    }
+}
+
+.inputbox ion-icon {
+    position: absolute;
+    right: 8px;
+    color: #fff;
+    font-size: 1.2rem;
+    top: 20px;
+}
+
+@media (max-width: 480px) {
+    .inputbox ion-icon {
+        top: 15px;
+        font-size: 1rem;
+    }
+}
+
+.form-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    margin-top: 5px;
+}
+
+@media (max-width: 480px) {
+    .form-text {
+        font-size: 0.7rem;
+    }
+}
+
+button {
+    width: 100%;
+    height: 40px;
+    border-radius: 40px;
+    background-color: rgb(255, 255,255, 1);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.4s ease;
+    margin-top: 20px;
+}
+
+button:hover {
+  background-color: rgb(255, 255,255, 0.5);
+}
+
+.login {
+    font-size: 0.9rem;
+    color: #fff;
+    text-align: center;
+    margin: 25px 0 10px;
+}
+
+@media (max-width: 480px) {
+    .login {
+        font-size: 0.8rem;
+    }
+}
+
+.login p a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+}
+
+.login p a:hover {
+    text-decoration: underline;
+}
+
+form {
+    width: 100%;
+}
+    </style>
+    <title>Register - Antlers</title>
+</head>
+
+<body>
+    <section>
+        <form action="{{ url_for('register') }}" method="POST">
+            <h1>Create Account</h1>
+
+            <div class="inputbox">
+                <ion-icon name="person-outline"></ion-icon>
+                <input type="text" name="username" required>
+                <label>Username</label>
             </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+
+            <div class="inputbox">
+                <ion-icon name="mail-outline"></ion-icon>
+                <input type="email" name="email" required>
+                <label>Email Address</label>
+            </div>
+
+            <div class="inputbox">
+                <ion-icon name="call-outline"></ion-icon>
+                <input type="tel" name="contact_number" required>
+                <label>Contact Number</label>
+            </div>
+
+            <div class="inputbox">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" name="password" id="password" required>
+                <label>Password</label>
+            </div>
+            <div class="form-text">Password must be at least 6 characters long</div>
+
+            <div class="inputbox">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" name="confirm_password" id="confirm_password" required>
+                <label>Confirm Password</label>
+            </div>
+
+            <button type="submit">Register</button>
+
+            <div class="login">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+            </div>
+        </form>
+    </section>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+        }
+    });
+    </script>
+</body>
+</html>
