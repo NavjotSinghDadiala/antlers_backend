@@ -214,6 +214,37 @@ button:hover {
 form {
     width: 100%;
 }
+
+/* Flash messages styling */
+.flash-messages {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.flash-message {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: #fff;
+    text-align: center;
+}
+
+.flash-success {
+    background-color: rgba(76, 175, 80, 0.7);
+}
+
+.flash-danger {
+    background-color: rgba(244, 67, 54, 0.7);
+}
+
+.flash-warning {
+    background-color: rgba(255, 152, 0, 0.7);
+}
+
+.flash-info {
+    background-color: rgba(33, 150, 243, 0.7);
+}
     </style>
     <title>Login - Antlers</title>
 </head>
@@ -223,18 +254,30 @@ form {
         <form action="{{ url_for('login') }}" method="POST">
             <h1>Login</h1>
 
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
             <div class="inputbox">
                 <ion-icon name="person-outline"></ion-icon>
                 <input type="text" name="username" required>
                 <label>Username</label>
             </div>
-
+            
             <div class="inputbox">
                 <ion-icon name="lock-closed-outline"></ion-icon>
                 <input type="password" name="password" required>
                 <label>Password</label>
             </div>
-
 
             <button type="submit">Log in</button>
 

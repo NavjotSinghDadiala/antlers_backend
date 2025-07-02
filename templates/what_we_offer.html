@@ -30,7 +30,7 @@
     <h2 class="text-center mb-5 section-heading animate fadeInUp">Our Core Services</h2>
     <div class="row g-4">
         <!-- Borrow Section -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <div class="service-card animate fadeInUp highlight-element" style="animation-delay: 0.1s">
                 <i class="fas fa-hand-holding fa-3x service-icon"></i>
                 <h3 class="service-title">Borrow</h3>
@@ -39,7 +39,7 @@
             </div>
         </div>
         <!-- Lend Section -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <div class="service-card animate fadeInUp highlight-element" style="animation-delay: 0.2s">
                 <i class="fas fa-share-alt fa-3x service-icon"></i>
                 <h3 class="service-title">Lend</h3>
@@ -48,12 +48,21 @@
             </div>
         </div>
         <!-- Donate Section -->
-        <div class="col-md-4">
+        <div class="col-md-6 col-lg-3">
             <div class="service-card animate fadeInUp highlight-element" style="animation-delay: 0.3s">
                 <i class="fas fa-gift fa-3x service-icon"></i>
                 <h3 class="service-title">Donate</h3>
                 <p class="service-description">Give items you no longer need to those who can use them. Support sustainability through reuse.</p>
                 <a href="#" class="btn btn-primary rounded-pill">Start Donating</a>
+            </div>
+        </div>
+        <!-- Swap Game Section -->
+        <div class="col-md-6 col-lg-3">
+            <div class="service-card animate fadeInUp highlight-element" style="animation-delay: 0.4s">
+                <i class="fas fa-exchange-alt fa-3x service-icon"></i>
+                <h3 class="service-title">Swap Game</h3>
+                <p class="service-description">Participate in our weekly swap events! Submit an item, get admin approval, and receive a surprise item in return.</p>
+                <a href="{{ url_for('game_selection') }}" class="btn btn-primary rounded-pill">Join Swap</a>
             </div>
         </div>
     </div>
@@ -72,7 +81,7 @@
         </div>
         
         <div class="row g-4">
-            <div class="col-md-6 fade-in">
+            <div class="col-md-6 col-lg-4 fade-in">
                 <div class="benefit-card h-100 border-0 shadow-sm p-4 hover-lift glass-card">
                     <div class="d-flex align-items-center mb-3">
                         <i class="fas fa-dollar-sign benefit-icon me-3"></i>
@@ -82,7 +91,7 @@
                 </div>
             </div>
             
-            <div class="col-md-6 fade-in delay-1">
+            <div class="col-md-6 col-lg-4 fade-in delay-1">
                 <div class="benefit-card h-100 border-0 shadow-sm p-4 hover-lift glass-card">
                     <div class="d-flex align-items-center mb-3">
                         <i class="fas fa-leaf benefit-icon me-3"></i>
@@ -92,7 +101,7 @@
                 </div>
             </div>
             
-            <div class="col-md-6 fade-in delay-2">
+            <div class="col-md-6 col-lg-4 fade-in delay-2">
                 <div class="benefit-card h-100 border-0 shadow-sm p-4 hover-lift glass-card">
                     <div class="d-flex align-items-center mb-3">
                         <i class="fas fa-users benefit-icon me-3"></i>
@@ -102,13 +111,23 @@
                 </div>
             </div>
             
-            <div class="col-md-6 fade-in delay-3">
+            <div class="col-md-6 col-lg-4 fade-in delay-3">
                 <div class="benefit-card h-100 border-0 shadow-sm p-4 hover-lift glass-card">
                     <div class="d-flex align-items-center mb-3">
                         <i class="fas fa-shield-alt benefit-icon me-3"></i>
                         <h4 class="fw-bold mb-0">Secure & Trusted</h4>
                     </div>
                     <p class="mb-0">Our platform ensures secure transactions and builds trust between community members. With user verification and reviews, you can feel confident in every exchange.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 fade-in delay-4">
+                <div class="benefit-card h-100 border-0 shadow-sm p-4 hover-lift glass-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-exchange-alt benefit-icon me-3"></i>
+                        <h4 class="fw-bold mb-0">Weekly Swaps</h4>
+                    </div>
+                    <p class="mb-0">Participate in our weekly swap events to refresh your possessions. Submit items you no longer need and receive something new in return. It's a fun way to reduce waste while discovering new treasures.</p>
                 </div>
             </div>
         </div>

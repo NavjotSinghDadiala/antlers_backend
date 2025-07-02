@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Swap Chat - Antlers{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .chat-header {
+        background: linear-gradient(135deg, var(--primary-color-light) 0%, var(--primary-color) 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 1rem 1rem 0 0;
+    }
+    .chat-messages {
+        height: 400px;
+        overflow-y: auto;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .message {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+    .message.sent {
+        align-items: flex-end;
+    }
+    .message.received {
+        align-items: flex-start;
+    }
+    .message-content {
+        max-width: 70%;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        position: relative;
+    }
+    .message.sent .message-content {
+        background: var(--primary-color);
+        color: white;
+        border-radius: 1rem 1rem 0 1rem;
+    }
+    .message.received .message-content {
+        background: #f0f0f0;
+        color: #333;
+        border-radius: 1rem 1rem 1rem 0;
+    }
+    .message-header {
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+        color: #666;
+    }
+    .message.sent .message-header {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .chat-input {
+        padding: 1rem;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-top: none;
+        border-radius: 0 0 1rem 1rem;
+    }
+    .chat-input form {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .chat-input input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+    }
+    .chat-input button {
+        padding: 0.75rem 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    .chat-input button:hover {
+        background: var(--primary-color-dark);
+    }
+    .back-button {
+        margin-top: 1rem;
+        text-align: center;
+    }
+    .back-button a {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        transition: background 0.3s ease;
+    }
+    .back-button a:hover {
+        background: var(--primary-color-dark);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <h4 class="mb-2">Swap Chat</h4>
+            <div class="swap-details">
+                <p class="mb-1">
+                    <strong>Item:</strong> {{ swap_item.name }}<br>
+                    <strong>Category:</strong> {{ swap_item.category }}<br>
+                    <strong>Condition:</strong> {{ swap_item.condition }}
+                </p>
+                <p class="mb-0">
+                    <small>Chatting with: {{ other_user.username }}</small>
+                </p>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chatMessages">
+            {% for message in messages %}
+            <div class="message {% if message.sender_id == current_user.id %}sent{% else %}received{% endif %}">
+                <div class="message-header">
+                    {% if message.timestamp.date() == today %}
+                        Today at {{ message.timestamp.strftime('%I:%M %p') }}
+                    {% elif message.timestamp.date() == yesterday %}
+                        Yesterday at {{ message.timestamp.strftime('%I:%M %p') }}
+                    {% else %}
+                        {{ message.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
+                    {% endif %}
+                </div>
+                <div class="message-content">
+                    {{ message.message }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input -->
+        <div class="chat-input">
+            <form method="POST" class="message-form">
+                <input type="text" name="message" placeholder="Type your message..." required>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="back-button">
+        <a href="{{ url_for('profile') }}">Back to Profile</a>
+    </div>
+</div>
+
+<!-- Welcome Modal -->
+{% if show_modal %}
+<div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="welcomeModalLabel">Welcome to Swap Chat!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>You can now chat with your swap partner to coordinate the exchange of items.</p>
+                <p>Remember to:</p>
+                <ul>
+                    <li>Be respectful and professional</li>
+                    <li>Agree on a meeting time and location</li>
+                    <li>Confirm the condition of items before exchange</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll to bottom of chat
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Show welcome modal if needed
+        {% if show_modal %}
+        var welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+        welcomeModal.show();
+        {% endif %}
+    });
+</script>
+{% endblock %} 

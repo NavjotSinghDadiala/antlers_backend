@@ -41,6 +41,10 @@
                             <strong class="d-block mb-1"><i class="fas fa-gift me-2 text-primary"></i>As a Donor:</strong>
                             <p class="mb-0 small text-muted">Submit items you want to donate permanently.</p>
                         </div>
+                        <div class="role-option p-3 mb-2 bg-soft-accent rounded">
+                            <strong class="d-block mb-1"><i class="fas fa-exchange-alt me-2 text-primary"></i>As a Swapper:</strong>
+                            <p class="mb-0 small text-muted">Participate in weekly swap events to exchange items with others.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -114,6 +118,34 @@
                         <i class="fas fa-star text-accent"></i>
                         <p class="mb-0 mt-2 small font-italic">"Great transaction! Item was in perfect condition and the owner was very helpful."</p>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Swap Game Section -->
+            <div class="timeline-item left fade-in delay-6">
+                <div class="timeline-content shadow-sm">
+                    <div class="timeline-marker"></div>
+                    <h3>Swap Game</h3>
+                    <p class="text-muted">Participate in our weekly swap events! Submit an item, get admin approval, and receive a surprise item from another participant in return.</p>
+                    <div class="process-steps mt-3">
+                        <div class="step d-flex align-items-center mb-2">
+                            <span class="step-number">1</span>
+                            <span class="step-text">Submit an item for the swap game</span>
+                        </div>
+                        <div class="step d-flex align-items-center mb-2">
+                            <span class="step-number">2</span>
+                            <span class="step-text">Wait for admin approval</span>
+                        </div>
+                        <div class="step d-flex align-items-center mb-2">
+                            <span class="step-number">3</span>
+                            <span class="step-text">Join the weekend swap event</span>
+                        </div>
+                        <div class="step d-flex align-items-center">
+                            <span class="step-number">4</span>
+                            <span class="step-text">Arrange a virtual meeting for item delivery</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('game_selection') }}" class="btn btn-sm btn-primary rounded-pill mt-3">Join Swap Game</a>
                 </div>
             </div>
         </div>

@@ -2,353 +2,511 @@
 
 {% block title %}Admin Dashboard - Antlers{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Profile header styles */
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary-color-light) 0%, var(--primary-color) 100%);
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+        border-radius: 0 0 2rem 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dark-theme .profile-header {
+        background: linear-gradient(135deg, #3a1f5d 0%, #1a0a2e 100%);
+    }
+    
+    /* Animated background elements */
+    .animated-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        z-index: 0;
+    }
+    
+    .animated-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        animation: float 15s infinite ease-in-out;
+    }
+    
+    .circle-1 { width: 150px; height: 150px; top: -50px; left: 10%; animation-delay: 0s; }
+    .circle-2 { width: 80px; height: 80px; top: 30px; right: 15%; animation-delay: 2s; }
+    .circle-3 { width: 100px; height: 100px; bottom: -30px; left: 20%; animation-delay: 1s; }
+    .circle-4 { width: 120px; height: 120px; bottom: -40px; right: 25%; animation-delay: 3s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0) translateX(0); }
+        25% { transform: translateY(-15px) translateX(15px); }
+        50% { transform: translateY(10px) translateX(-10px); }
+        75% { transform: translateY(15px) translateX(5px); }
+    }
+    
+    /* Glass effect styles */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 1rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .glass-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .dark-theme .glass-card {
+        background: rgba(42, 42, 42, 0.7);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Card header styles */
+    .card-header {
+        padding: 1.5rem 2rem;
+        background: transparent;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .dark-theme .card-header {
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .card-header .card-title {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-left: 0.5rem;
+        color: var(--primary-color);
+    }
+    
+    .dark-theme .card-header .card-title {
+        color: var(--primary-color-light);
+    }
+    
+    .card-header .card-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 24px;
+        background: var(--accent-color);
+        border-radius: 2px;
+    }
+    
+    /* Table styles */
+    .glass-table {
+        background: transparent;
+        color: inherit;
+    }
+    
+    .glass-table thead th {
+        background: rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--primary-color);
+    }
+    
+    .dark-theme .glass-table thead th {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--primary-color-light);
+    }
+    
+    .glass-table tbody tr {
+        transition: all 0.3s ease;
+    }
+    
+    .glass-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .dark-theme .glass-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Button styles */
+    .glass-btn {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--accent-color-dark);
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .glass-btn:hover {
+        background: rgba(255, 255, 255, 0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark-theme .glass-btn {
+        background: rgba(70, 70, 70, 0.8);
+        color: var(--accent-color-light);
+    }
+    
+    .dark-theme .glass-btn:hover {
+        background: rgba(70, 70, 70, 0.9);
+    }
+    
+    /* Badge styles */
+    .glass-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--primary-color);
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        font-weight: 500;
+    }
+    
+    .dark-theme .glass-badge {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary-color-light);
+    }
+    
+    /* Stats cards */
+    .stats-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark-theme .stats-card {
+        background: rgba(42, 42, 42, 0.7);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Navbar styles */
+    .glass-navbar {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 1rem;
+        padding: 0.5rem;
+    }
+    
+    .dark-theme .glass-navbar {
+        background: rgba(42, 42, 42, 0.7);
+    }
+    
+    .nav-link {
+        color: var(--primary-color);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover,
+    .nav-link.active {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .dark-theme .nav-link {
+        color: var(--primary-color-light);
+    }
+    
+    .dark-theme .nav-link:hover,
+    .dark-theme .nav-link.active {
+        background: var(--primary-color-light);
+        color: var(--dark-bg);
+    }
+    
+    /* Mobile Responsive Adjustments */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0.5rem;
+        }
+        
+        .profile-header {
+            padding: 2rem 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .profile-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .profile-header p {
+            font-size: 0.9rem;
+        }
+        
+        /* Stats cards in mobile */
+        .stats-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stats-card i {
+            font-size: 2rem !important;
+        }
+        
+        .stats-card h3 {
+            font-size: 1rem;
+        }
+        
+        .stats-card p {
+            font-size: 1.5rem;
+        }
+        
+        /* Navigation in mobile */
+        .glass-navbar {
+            padding: 0.25rem;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Tables in mobile */
+        .table-responsive {
+            margin: 0 -0.5rem;
+        }
+        
+        .glass-table th,
+        .glass-table td {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Cards in mobile */
+        .glass-card {
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            padding: 1rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        /* Grid adjustments for mobile */
+        .row {
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+        }
+        
+        .col-md-3,
+        .col-md-6,
+        .col-12 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        /* Make tables more compact */
+        .glass-table {
+            font-size: 0.85rem;
+        }
+        
+        .glass-table img {
+            width: 40px !important;
+            height: 40px !important;
+        }
+        
+        /* Adjust badges and buttons */
+        .glass-badge {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .glass-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Extra small devices */
+    @media (max-width: 576px) {
+        .stats-card {
+            margin-bottom: 0.5rem;
+        }
+        
+        .glass-table th,
+        .glass-table td {
+            padding: 0.25rem;
+            font-size: 0.8rem;
+        }
+        
+        .card-header {
+            padding: 0.75rem;
+        }
+        
+        .card-body {
+            padding: 0.75rem;
+        }
+        
+        .nav-link {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h1 class="display-5 fade-in fw-bold">Admin Dashboard</h1>
-            <p class="text-muted fade-in">Manage users, items, and system settings</p>
+    <!-- Profile Header -->
+    <div class="profile-header mb-4">
+        <div class="animated-bg">
+            <div class="animated-circle circle-1"></div>
+            <div class="animated-circle circle-2"></div>
+            <div class="animated-circle circle-3"></div>
+            <div class="animated-circle circle-4"></div>
         </div>
-        <a href="{{ url_for('main') }}" class="btn btn-outline-primary rounded-pill fade-in">
-            <i class="fas fa-arrow-left me-2"></i>Back to Home
-        </a>
+        <div class="container profile-header-content">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-5 text-white fw-bold mb-2">Admin Dashboard</h1>
+                    <p class="text-white-50 mb-0">Manage users, items, and system settings</p>
+                </div>
+                <a href="{{ url_for('main') }}" class="glass-btn">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Stats Overview -->
-    <div class="row mb-5 fade-in">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body p-4 text-center">
-                    <i class="fas fa-users fa-3x mb-3"></i>
-                    <h3 class="h4 mb-2">Total Users</h3>
-                    <p class="h2 mb-0">{{ stats.total_users }}</p>
-                </div>
+    <div class="row g-2 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stats-card text-center">
+                <i class="fas fa-users fa-3x mb-2 text-primary"></i>
+                <h3 class="h6 mb-1">Total Users</h3>
+                <p class="h4 mb-0">{{ stats.total_users }}</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body p-4 text-center">
-                    <i class="fas fa-clock fa-3x mb-3"></i>
-                    <h3 class="h4 mb-2">Pending Items</h3>
-                    <p class="h2 mb-0">{{ stats.pending_items }}</p>
-                </div>
+        <div class="col-6 col-md-3">
+            <div class="stats-card text-center">
+                <i class="fas fa-clock fa-3x mb-2 text-warning"></i>
+                <h3 class="h6 mb-1">Pending Items</h3>
+                <p class="h4 mb-0">{{ stats.pending_items }}</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body p-4 text-center">
-                    <i class="fas fa-check-circle fa-3x mb-3"></i>
-                    <h3 class="h4 mb-2">Approved Items</h3>
-                    <p class="h2 mb-0">{{ stats.approved_items }}</p>
-                </div>
+        <div class="col-6 col-md-3">
+            <div class="stats-card text-center">
+                <i class="fas fa-check-circle fa-3x mb-2 text-success"></i>
+                <h3 class="h6 mb-1">Approved Items</h3>
+                <p class="h4 mb-0">{{ stats.approved_items }}</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body p-4 text-center">
-                    <i class="fas fa-exchange-alt fa-3x mb-3"></i>
-                    <h3 class="h4 mb-2">Active Borrows</h3>
-                    <p class="h2 mb-0">{{ stats.active_borrows }}</p>
+        <div class="col-6 col-md-3">
+            <div class="stats-card text-center">
+                <i class="fas fa-exchange-alt fa-3x mb-2 text-info"></i>
+                <h3 class="h6 mb-1">Active Borrows</h3>
+                <p class="h4 mb-0">{{ stats.active_borrows }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="glass-navbar mb-3">
+        <ul class="nav nav-pills flex-nowrap overflow-auto">
+            <li class="nav-item">
+                <a class="nav-link active" href="#dashboard">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#users">
+                    <i class="fas fa-users me-1"></i>Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#items">
+                    <i class="fas fa-box me-1"></i>Items
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#swaps">
+                    <i class="fas fa-exchange-alt me-1"></i>Swaps
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#borrows">
+                    <i class="fas fa-handshake me-1"></i>Borrows
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#returns">
+                    <i class="fas fa-undo me-1"></i>Returns
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Swap Game Admin Section -->
+    <div class="row g-2 mb-3">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Swap Game Admin</h4>
+                </div>
+                <div class="card-body p-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <a href="{{ url_for('admin_swap_items') }}" class="glass-btn w-100">
+                                <i class="fas fa-exchange-alt me-1"></i>Swap Items
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ url_for('admin_swap_assignments') }}" class="glass-btn w-100">
+                                <i class="fas fa-users me-1"></i>Assignments
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div class="glass-card p-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <strong>Active Event:</strong> 
+                                {% if active_swap_events > 0 %}
+                                    <span class="glass-badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="glass-badge bg-warning">None</span>
+                                {% endif %}
+                                <small class="d-block mt-1">Pending: {{ pending_swap_items }}</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Users Section -->
-    <div class="card fade-in mb-5">
-        <div class="card-header bg-white p-4">
-            <h2 class="card-title h4 mb-0">
-                <i class="fas fa-users me-2"></i>Registered Users
-            </h2>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Username</th>
-                            <th scope="col">Items Listed</th>
-                            <th scope="col">Items Borrowed</th>
-                            <th scope="col">Join Date</th>
-                            <th scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td>{{ user.id }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-user-circle fa-lg text-primary me-2"></i>
-                                    {{ user.username }}
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-success rounded-pill">
-                                    {{ user.pending_items|length + user.approved_items|length }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge bg-info rounded-pill">
-                                    {{ user.borrowed_items|length }}
-                                </span>
-                            </td>
-                            <td>
-                                <i class="fas fa-calendar-alt text-muted me-2"></i>
-                                {{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}
-                            </td>
-                            <td>
-                                <span class="badge bg-success">Active</span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pending Items Section -->
-    <div class="section-header fade-in mb-4">
-        <h2 class="fw-bold">Pending Items for Approval</h2>
-        <p class="text-muted">Review and approve new item listings</p>
-    </div>
-    
-    <div class="dashboard-grid">
-        {% for item in items %}
-        <div class="card fade-in">
-            {% if item.image %}
-            <div class="position-relative">
-                <a href="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" target="_blank">
-                    <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" 
-                         class="card-img-top" 
-                         alt="{{ item.name }}"
-                         style="height: 200px; object-fit: cover;">
-                </a>
-                <span class="badge bg-{{ item.type|lower == 'donate' and 'warning' or 'primary' }} position-absolute top-0 end-0 m-3 rounded-pill">
-                    <i class="fas {{ item.type|lower == 'donate' and 'fa-gift' or 'fa-share-alt' }} me-1"></i>
-                    {{ item.type|title }}
-                </span>
-            </div>
-            {% else %}
-            <div class="position-relative">
-                <i class="fas fa-image text-muted position-absolute top-0 end-0 m-3" style="font-size: 24px;"></i>
-            </div>
-            {% endif %}
-            <div class="card-body p-4">
-                <h5 class="card-title fw-bold mb-3">{{ item.name }}</h5>
-                <div class="card-text">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-tag text-muted me-2"></i>
-                        <span>{{ item.category }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
-                        <span>Pickup: {{ item.location }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-home text-muted me-2"></i>
-                        <span>Residence: {{ item.residence }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-clock text-muted me-2"></i>
-                        <span>Available: {{ item.datetime.strftime('%Y-%m-%d %H:%M') }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-user text-muted me-2"></i>
-                        <span>Posted by: {{ item.user.username }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-phone text-muted me-2"></i>
-                        <span>Contact: {{ item.user.contact_number }}</span>
-                    </div>
-                    {% if item.description %}
-                    <div class="d-flex align-items-start mb-2">
-                        <i class="fas fa-info-circle text-muted me-2 mt-1"></i>
-                        <span>Description: {{ item.description }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="{{ url_for('approve', item_id=item.id) }}" class="btn btn-success rounded-pill flex-grow-1">
-                        <i class="fas fa-check me-2"></i>Approve
-                    </a>
-                    <button type="button" class="btn btn-danger rounded-pill flex-grow-1" data-bs-toggle="modal" data-bs-target="#rejectModal{{ item.id }}">
-                        <i class="fas fa-times me-2"></i>Reject
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reject Modal -->
-        <div class="modal fade" id="rejectModal{{ item.id }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm Rejection</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to reject this item?</p>
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            This action cannot be undone.
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancel</button>
-                        <a href="{{ url_for('reject', item_id=item.id) }}" class="btn btn-danger rounded-pill">
-                            <i class="fas fa-times me-2"></i>Reject Item
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="card fade-in">
-            <div class="card-body text-center p-5">
-                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                <h3 class="h5 mb-3">All Clear!</h3>
-                <p class="text-muted mb-0">No pending items requiring approval.</p>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Return Requests Section -->
-    <div class="section-header fade-in mb-4 mt-5">
-        <h2 class="fw-bold">Return Requests</h2>
-        <p class="text-muted">Monitor item return processes</p>
-    </div>
-    
-    <div class="dashboard-grid">
-        {% for return_request in return_requests %}
-        <div class="card fade-in">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <h5 class="card-title fw-bold mb-0">{{ return_request.item_name }}</h5>
-                    <span class="badge bg-{{ return_request.status == 'pending' and 'warning' or (return_request.status == 'approved' and 'info' or 'success') }} rounded-pill">
-                        {{ return_request.status|title }}
-                    </span>
-                </div>
-                <div class="card-text">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-user text-muted me-2"></i>
-                        <span>Lender: {{ return_request.lender.username }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-user text-muted me-2"></i>
-                        <span>Borrower: {{ return_request.borrower.username }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
-                        <span>Return at: {{ return_request.return_location }}</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-calendar-alt text-muted me-2"></i>
-                        <span>Created: {{ return_request.created_at.strftime('%Y-%m-%d') }}</span>
-                    </div>
-                    
-                    <!-- Confirmation Status -->
-                    <div class="d-flex justify-content-between mb-3">
-                        <div>
-                            <span class="badge {% if return_request.lender_confirmed_return %}bg-success{% else %}bg-secondary{% endif %} me-2">
-                                <i class="fas {% if return_request.lender_confirmed_return %}fa-check-circle{% else %}fa-circle{% endif %} me-1"></i>
-                                Lender Confirmed
-                            </span>
-                        </div>
-                        <div>
-                            <span class="badge {% if return_request.borrower_confirmed_return %}bg-success{% else %}bg-secondary{% endif %}">
-                                <i class="fas {% if return_request.borrower_confirmed_return %}fa-check-circle{% else %}fa-circle{% endif %} me-1"></i>
-                                Borrower Confirmed
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="card fade-in">
-            <div class="card-body text-center p-5">
-                <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
-                <p class="text-muted mb-0">No return requests to display.</p>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
-<!-- Add this right after the first navbar in admin_dashboard.html -->
-<div class="container-fluid">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light rounded-pill mb-4 fade-in">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="adminNavbar">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard">
-                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#users">
-                            <i class="fas fa-users me-2"></i>Users
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#accessories">
-                            <i class="fas fa-box me-2"></i>Accessories
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#pending">
-                            <i class="fas fa-clock me-2"></i>Pending Items
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#borrows">
-                            <i class="fas fa-handshake me-2"></i>Borrows
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#returns">
-                            <i class="fas fa-undo me-2"></i>Returns
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#history">
-                            <i class="fas fa-history me-2"></i>History
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Database Overview Section -->
-    <div class="row">
-        <!-- Users Table -->
-        <div class="col-12 mb-4" id="users">
-            <div class="card fade-in">
-                <div class="card-header bg-white p-4">
-                    <h3 class="card-title h4 mb-0">
-                        <i class="fas fa-users me-2"></i>Users
-                    </h3>
+    <div class="row g-2 mb-3" id="users">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Users</h4>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
+                        <table class="glass-table table">
+                            <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Username</th>
                                     <th>Role</th>
-                                    <th>Created At</th>
-                                    <th>Items Listed</th>
-                                    <th>Items Borrowed</th>
+                                    <th>Created</th>
+                                    <th>Listed</th>
+                                    <th>Borrowed</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -356,8 +514,8 @@
                                 <tr>
                                     <td>{{ user.id }}</td>
                                     <td>{{ user.username }}</td>
-                                    <td><span class="badge bg-{{ user.role == 'admin' and 'danger' or 'primary' }} rounded-pill">{{ user.role }}</span></td>
-                                    <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td><span class="glass-badge">{{ user.role }}</span></td>
+                                    <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
                                     <td>{{ user.approved_items|length }}</td>
                                     <td>{{ user.borrowed_items|length }}</td>
                                 </tr>
@@ -368,19 +526,19 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Accessories Table -->
-        <div class="col-12 mb-4" id="accessories">
-            <div class="card fade-in">
-                <div class="card-header bg-white p-4">
-                    <h3 class="card-title h4 mb-0">
-                        <i class="fas fa-box me-2"></i>Approved Accessories
-                    </h3>
+    <!-- Items Section -->
+    <div class="row g-2 mb-3" id="items">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Approved Items</h4>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
+                        <table class="glass-table table">
+                            <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Image</th>
@@ -390,7 +548,6 @@
                                     <th>Location</th>
                                     <th>Owner</th>
                                     <th>Status</th>
-                                    <th>Created At</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -399,169 +556,25 @@
                                     <td>{{ item.id }}</td>
                                     <td>
                                         {% if item.image %}
-                                            <img src="{{ url_for('static', filename=item.image) }}" 
-                                                 alt="{{ item.name }}" 
-                                                 class="admin-table-img rounded"
-                                                 style="width: 50px; height: 50px; object-fit: cover;">
+                                            <a href="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" target="_blank">
+                                                <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}"
+                                                     alt="{{ item.name }}"
+                                                     class="rounded"
+                                                     style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;">
+                                            </a>
                                         {% else %}
                                             <i class="fas fa-image text-muted"></i>
                                         {% endif %}
                                     </td>
                                     <td>{{ item.name }}</td>
                                     <td>{{ item.category }}</td>
-                                    <td><span class="badge bg-{{ item.type == 'donate' and 'warning' or 'primary' }} rounded-pill">{{ item.type }}</span></td>
+                                    <td><span class="glass-badge">{{ item.type }}</span></td>
                                     <td>{{ item.location }}</td>
                                     <td>{{ item.owner.username }}</td>
-                                    <td><span class="badge bg-{{ item.is_available and 'success' or 'danger' }} rounded-pill">{{ item.is_available and 'Available' or 'Borrowed' }}</span></td>
-                                    <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                </tr>
-
-                                <!-- Image Modal for each item -->
-                                <div class="modal fade" id="imageModal{{ item.id }}" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header border-0">
-                                                <h5 class="modal-title">{{ item.name }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body text-center p-0">
-                                                <img src="{{ url_for('static', filename=item.image) }}" 
-                                                     alt="{{ item.name }}"
-                                                     class="img-fluid rounded">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Borrowed Items Table -->
-        <div class="col-12 mb-4" id="borrows">
-            <div class="card fade-in">
-                <div class="card-header bg-white p-4">
-                    <h3 class="card-title h4 mb-0">
-                        <i class="fas fa-handshake me-2"></i>Borrowed Items
-                    </h3>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Item</th>
-                                    <th>Borrower</th>
-                                    <th>Lender</th>
-                                    <th>Status</th>
-                                    <th>Pickup Location</th>
-                                    <th>Pickup Time</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for borrow in borrowed_items %}
-                                <tr>
-                                    <td>{{ borrow.id }}</td>
-                                    <td>{{ borrow.accessory.name }}</td>
-                                    <td>{{ borrow.borrower.username }}</td>
-                                    <td>{{ borrow.lender.username }}</td>
-                                    <td><span class="badge bg-{{ borrow.status == 'approved' and 'success' or 'warning' }} rounded-pill">{{ borrow.status }}</span></td>
-                                    <td>{{ borrow.pickup_location }}</td>
-                                    <td>{{ borrow.pickup_datetime.strftime('%Y-%m-%d %H:%M') }}</td>
-                                    <td>{{ borrow.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Return Requests Table -->
-        <div class="col-12 mb-4" id="returns">
-            <div class="card fade-in">
-                <div class="card-header bg-white p-4">
-                    <h3 class="card-title h4 mb-0">
-                        <i class="fas fa-undo me-2"></i>Return Requests
-                    </h3>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Item</th>
-                                    <th>Borrower</th>
-                                    <th>Lender</th>
-                                    <th>Status</th>
-                                    <th>Return Location</th>
-                                    <th>Return Time</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for return_req in return_requests %}
-                                <tr>
-                                    <td>{{ return_req.id }}</td>
-                                    <td>{{ return_req.item_name }}</td>
-                                    <td>{{ return_req.borrower.username }}</td>
-                                    <td>{{ return_req.lender.username }}</td>
-                                    <td><span class="badge bg-{{ return_req.status == 'approved' and 'success' or 'warning' }} rounded-pill">{{ return_req.status }}</span></td>
-                                    <td>{{ return_req.return_location }}</td>
-                                    <td>{{ return_req.return_datetime }}</td>
-                                    <td>{{ return_req.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Borrow History Table -->
-        <div class="col-12 mb-4" id="history">
-            <div class="card fade-in">
-                <div class="card-header bg-white p-4">
-                    <h3 class="card-title h4 mb-0">
-                        <i class="fas fa-history me-2"></i>Borrow History
-                    </h3>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Item</th>
-                                    <th>Category</th>
-                                    <th>Borrower</th>
-                                    <th>Lender</th>
-                                    <th>Borrow Date</th>
-                                    <th>Return Date</th>
-                                    <th>Locations</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for history in borrow_history %}
-                                <tr>
-                                    <td>{{ history.id }}</td>
-                                    <td>{{ history.item_name }}</td>
-                                    <td>{{ history.item_category }}</td>
-                                    <td>{{ history.borrower.username }}</td>
-                                    <td>{{ history.lender.username }}</td>
-                                    <td>{{ history.borrow_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                                    <td>{{ history.return_date.strftime('%Y-%m-%d %H:%M') if history.return_date else 'Not returned' }}</td>
                                     <td>
-                                        <small class="d-block">Pickup: {{ history.pickup_location }}</small>
-                                        <small class="d-block">Return: {{ history.return_location or 'N/A' }}</small>
+                                        <span class="glass-badge {% if item.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ item.is_available and 'Available' or 'Borrowed' }}
+                                        </span>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -572,60 +585,76 @@
             </div>
         </div>
     </div>
+
+    <!-- Pending Items Section -->
+    <div class="row g-2 mb-3" id="pending">
+        <div class="col-12">
+            <div class="glass-card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Pending Items</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        {% for item in pending_items %}
+                        <div class="col-6">
+                            <div class="glass-card h-100">
+                                {% if item.image %}
+                                <a href="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" target="_blank">
+                                    <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}"
+                                         class="card-img-top"
+                                         alt="{{ item.name }}"
+                                         style="height: 150px; object-fit: cover; cursor: pointer;">
+                                </a>
+                                {% endif %}
+                                <div class="card-body p-2">
+                                    <h5 class="card-title h6 mb-1">{{ item.name }}</h5>
+                                    <p class="card-text small mb-2">
+                                        <span class="d-block">Category: {{ item.category }}</span>
+                                        <span class="d-block">Type: {{ item.type }}</span>
+                                        <span class="d-block">Location: {{ item.location }}</span>
+                                        <span class="d-block">By: {{ item.user.username }}</span>
+                                    </p>
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ url_for('approve', item_id=item.id) }}" class="glass-btn flex-grow-1">
+                                            <i class="fas fa-check me-1"></i>Approve
+                                        </a>
+                                        <button type="button" class="glass-btn flex-grow-1" data-bs-toggle="modal" data-bs-target="#rejectModal{{ item.id }}">
+                                            <i class="fas fa-times me-1"></i>Reject
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Reject Modal -->
+                        <div class="modal fade" id="rejectModal{{ item.id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ item.id }}" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="rejectModalLabel{{ item.id }}">Reject Item: {{ item.name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <form method="POST" action="{{ url_for('reject', item_id=item.id) }}">
+                                <div class="modal-body">
+                                  <div class="mb-3">
+                                    <label for="rejection_reason_{{ item.id }}" class="form-label">Reason for rejection</label>
+                                    <textarea class="form-control" id="rejection_reason_{{ item.id }}" name="rejection_reason" rows="3" required></textarea>
+                                  </div>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                  <button type="submit" class="btn btn-danger">Reject</button>
+                                </div>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<!-- Add this CSS to your existing styles -->
-<style>
-    .navbar-nav .nav-link {
-        padding: 0.75rem 1.5rem;
-        border-radius: 50px;
-        margin: 0 0.25rem;
-        transition: all 0.3s ease;
-    }
-
-    .navbar-nav .nav-link:hover,
-    .navbar-nav .nav-link.active {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
-    .table th {
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    .table td {
-        vertical-align: middle;
-    }
-
-    .badge {
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-    }
-
-    .admin-table-img {
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .modal-dialog {
-        max-width: 800px;
-    }
-
-    .modal-content {
-        border: none;
-        border-radius: 15px;
-        overflow: hidden;
-    }
-
-    .modal-body img {
-        max-height: 80vh;
-        object-fit: contain;
-    }
-</style>
 
 <!-- Add this JavaScript for smooth scrolling -->
 <script>

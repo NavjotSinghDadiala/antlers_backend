@@ -190,7 +190,7 @@
         <p class="text-muted">Currently active borrows and delivered items</p>
     </div>
     <div class="row">
-        {% for request in approved_requests %}
+        {% for request in active_requests %}
         <div class="col-md-4 mb-4">
             <div class="card h-100 fade-in">
                 {% if request.accessory and request.accessory.image %}

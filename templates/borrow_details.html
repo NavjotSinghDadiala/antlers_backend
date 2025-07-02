@@ -230,7 +230,7 @@
                                     <i class="fas fa-check me-2"></i>Confirm Item Receipt
                                 </button>
                             </form>
-                        {% elif borrow_request.status == 'delivered' and current_user.id == borrow_request.borrower_id %}
+                        {% elif borrow_request.status == 'delivered' and current_user.id == borrow_request.borrower_id and not active_return_request %}
                             <a href="{{ url_for('return_request', borrow_id=borrow_request.id) }}" class="btn btn-primary">
                                 <i class="fas fa-undo me-2"></i>Return Item
                             </a>
@@ -322,6 +322,8 @@
     </div>
 </div>
 {% endif %}
+
+{% set active_return_request = borrow_request.accessory.return_requests | selectattr('borrower_id', 'equalto', current_user.id) | selectattr('status', 'in', ['pending', 'approved']) | list | length > 0 %}
 {% endblock %}
 
 {% block extra_js %}

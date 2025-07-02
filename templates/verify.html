@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Email - Antlers{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verify-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary-color-light) 0%, var(--primary-color) 100%);
+        padding: 2rem 0;
+    }
+    
+    .dark-theme .verify-container {
+        background: linear-gradient(135deg, #3a1f5d 0%, #1a0a2e 100%);
+    }
+    
+    .verify-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .dark-theme .verify-card {
+        background: rgba(42, 42, 42, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .verify-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-dark) 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .dark-theme .verify-icon {
+        background: linear-gradient(135deg, var(--accent-color-dark) 0%, #614931 100%);
+    }
+    
+    .verify-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--accent-color-dark);
+    }
+    
+    .dark-theme .verify-title {
+        color: var(--accent-color-light);
+    }
+    
+    .verify-subtitle {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .dark-theme .verify-subtitle {
+        color: #aaa;
+    }
+    
+    .phone-number {
+        background: rgba(0, 0, 0, 0.05);
+        padding: 1rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+        font-weight: 600;
+        color: var(--accent-color-dark);
+    }
+    
+    .dark-theme .phone-number {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--accent-color-light);
+    }
+    
+    .otp-input {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    
+    .otp-input input {
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        border: 2px solid #ddd;
+        border-radius: 1rem;
+        background: white;
+        transition: all 0.3s ease;
+    }
+    
+    .dark-theme .otp-input input {
+        background: #333;
+        border-color: #555;
+        color: white;
+    }
+    
+    .otp-input input:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(97, 73, 49, 0.1);
+        outline: none;
+    }
+    
+    .dark-theme .otp-input input:focus {
+        border-color: var(--accent-color-light);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+    
+    .verify-btn {
+        background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-dark) 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .verify-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(97, 73, 49, 0.3);
+    }
+    
+    .resend-btn {
+        background: transparent;
+        color: var(--accent-color-dark);
+        border: 2px solid var(--accent-color);
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .dark-theme .resend-btn {
+        color: var(--accent-color-light);
+        border-color: var(--accent-color-light);
+    }
+    
+    .resend-btn:hover {
+        background: var(--accent-color);
+        color: white;
+    }
+    
+    .dark-theme .resend-btn:hover {
+        background: var(--accent-color-light);
+        color: #333;
+    }
+    
+    .back-link {
+        color: var(--accent-color-dark);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    .dark-theme .back-link {
+        color: var(--accent-color-light);
+    }
+    
+    .back-link:hover {
+        color: var(--accent-color);
+    }
+    
+    .timer {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 1rem;
+    }
+    
+    .dark-theme .timer {
+        color: #aaa;
+    }
+    
+    .manual-otp {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #856404;
+    }
+    
+    .dark-theme .manual-otp {
+        background: rgba(255, 193, 7, 0.2);
+        border-color: rgba(255, 193, 7, 0.5);
+        color: #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
+                        <h2 class="card-title">Verify Your Email</h2>
+                        <p class="text-muted">We've sent a verification code to your email address</p>
+                    </div>
+                    
+                    <div class="alert alert-info text-center mb-4">
+                        <i class="fas fa-envelope me-2"></i>
+                        <strong>{{ email }}</strong>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('verify') }}">
+                        <div class="mb-3">
+                            <label for="otp" class="form-label">Enter OTP</label>
+                            <input type="text" class="form-control form-control-lg text-center" 
+                                   id="otp" name="otp" maxlength="6" pattern="[0-9]{6}" 
+                                   placeholder="000000" required autocomplete="off">
+                        </div>
+                        
+                        <button type="submit" name="action" value="verify" class="btn btn-primary btn-lg w-100 mb-3">
+                            <i class="fas fa-check me-2"></i>Verify OTP
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{{ url_for('verify') }}">
+                        <button type="submit" name="action" value="resend" class="btn btn-outline-primary w-100 mb-3">
+                            <i class="fas fa-redo me-2"></i>Resend OTP
+                        </button>
+                    </form>
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('register') }}" class="text-decoration-none">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Registration
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const otpInput = document.querySelector('input[name="otp"]');
+    const resendBtn = document.getElementById('resendBtn');
+    const timer = document.getElementById('timer');
+    const countdown = document.getElementById('countdown');
+    
+    // Auto-focus OTP input
+    otpInput.focus();
+    
+    // Handle OTP input formatting
+    otpInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+    });
+    
+    // Handle resend button cooldown
+    let cooldownTime = 60;
+    let cooldownInterval;
+    
+    function startCooldown() {
+        resendBtn.disabled = true;
+        timer.style.display = 'block';
+        countdown.textContent = cooldownTime;
+        
+        cooldownInterval = setInterval(function() {
+            cooldownTime--;
+            countdown.textContent = cooldownTime;
+            
+            if (cooldownTime <= 0) {
+                clearInterval(cooldownInterval);
+                resendBtn.disabled = false;
+                timer.style.display = 'none';
+                cooldownTime = 60;
+            }
+        }, 1000);
+    }
+    
+    // Start cooldown on page load (if OTP was recently sent)
+    const otpTime = {{ session.get('otp_time', 0) }};
+    const currentTime = Math.floor(Date.now() / 1000);
+    const timeSinceOtp = currentTime - otpTime;
+    
+    if (timeSinceOtp < 60) {
+        cooldownTime = 60 - timeSinceOtp;
+        startCooldown();
+    }
+    
+    // Handle resend button click
+    resendBtn.addEventListener('click', function() {
+        startCooldown();
+    });
+    
+    // Auto-submit when 6 digits are entered
+    otpInput.addEventListener('input', function() {
+        if (this.value.length === 6) {
+            setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        }
+    });
+});
+</script>
+{% endblock %} 
