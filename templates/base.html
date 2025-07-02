@@ -16,6 +16,33 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     {% block extra_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-responsive.css') }}">
+    <style>
+        @media (max-width: 991.98px) {
+            .navbar .navbar-collapse .navbar-nav.mobile-nav-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.25rem;
+                padding: 0.5rem 0;
+            }
+        
+            .navbar .navbar-collapse .navbar-nav.mobile-nav-grid .nav-item {
+                display: flex !important;
+                justify-content: center;
+                padding: 0.25rem;
+                width: 100%;
+            }
+        
+            .navbar .navbar-collapse .navbar-nav.mobile-nav-grid .nav-link,
+            .navbar .navbar-collapse .navbar-nav.mobile-nav-grid .btn {
+                width: 100%;
+                text-align: center;
+                font-size: 0.85rem;
+                padding: 0.3rem 0.2rem;
+                border-radius: 0.5rem;
+            }
+        }
+        </style>
+        
     {% endblock %}
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/images/AntlerFav.png') }}">
     <style>
@@ -286,223 +313,164 @@
         
         /* Footer Styling */
         .footer {
-            background: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 100%);
-            color: var(--accent-color-light);
+    position: relative;
+    color: rgb(45, 44, 44);
+    overflow: hidden;
+}
+
+.footer-bg-glass {
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(1px) saturate(10%);
+    background: rgba(58, 57, 57, 0.1); /* Adjust opacity for glass feel */
+    z-index: 1;
+}
+
+.footer-glass-box {
+    position: absolute;
+    top: 8%;
+    left: 10%;
+    right: 6%;
+    bottom: 8%;
+    border-radius: 3rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(5px);
+    z-index: 1;
+    box-shadow: 0 0 20px rgba(137, 136, 136, 0.1);
+}
+
+        
+        .footer .container, .footer .footer-logo, .footer .footer-about, .footer .footer-nav, .footer .footer-social, .footer-divider, .footer-bottom {
             position: relative;
-            padding: 5rem 0 1.5rem;
-            margin-top: 4rem;
+            z-index: 2;
         }
         
-        /* Glass Footer in Light Mode */
-        body:not(.dark-theme) .footer {
-            background: linear-gradient(135deg, rgba(138, 113, 82, 0.5) 0%, rgba(167, 140, 115, 0.5) 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        .footer-logo h4, .footer-about p, .footer-nav-link, .footer-social h5, .footer-social .social-icon, .footer-bottom p {
+            color: #fff !important;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.25), 0 1px 0 #222;
         }
         
-        /* Black Footer in Dark Theme */
-        .dark-theme .footer {
-            background: #000000;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.8);
-        }
-        
-        .footer-wave {
-            position: absolute;
-            top: -100px;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            line-height: 0;
-        }
-        
-        .footer-wave svg path {
-            fill: var(--background-light);
-        }
-        
-        .dark-theme .footer-wave svg path {
-            fill: #000010;
-        }
-        
-        .footer-logo {
-            display: inline-block;
-            margin-bottom: 1.5rem;
-        }
-        
+        /* Enhanced Footer Text Styling */
         .footer-logo h4 {
             font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            color: #42240C;
-            margin-top: 0.5rem;
-            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
-            font-size: 1.8rem;
-        }
-        
-        .dark-theme .footer-logo h4 {
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-        
-        .footer-icon {
-            font-size: 3rem;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #ff3c3c 10%, #fff 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 12px #6b1a1a, 0 1px 0 #222;
             margin-bottom: 0.5rem;
-            display: block;
-            color: #42240C;
-            filter: drop-shadow(0 2px 5px rgba(255, 255, 255, 0.5));
-        }
-        
-        .dark-theme .footer-icon {
-            color: #ffffff;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-        }
-        
-        .footer-about p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-            color: #333333;
-            font-weight: 500;
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
-        }
-        
-        .dark-theme .footer-about p {
-            color: #f0f0f0;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-        
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        /* Social Icons */
-        .social-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            margin: 0 10px;
-            transition: all 0.3s ease;
-        }
-        
-        /* Glass Social Icons in Light Mode */
-        body:not(.dark-theme) .social-icon {
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--accent-color);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        body:not(.dark-theme) .social-icon:hover {
-            background: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            transform: translateY(-8px) rotate(5deg);
-        }
-        
-        /* Black Social Icons for Dark Mode */
-        .dark-theme .social-icon {
-            background: #000000;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-        }
-        
-        .dark-theme .social-icon:hover {
-            background: rgba(255, 255, 255, 0.9);
-            color: #000000;
-            border-color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-            transform: translateY(-3px);
-        }
-        
-        .social-icon.instagram:hover,
-        .social-icon.whatsapp:hover,
-        .social-icon.linkedin:hover {
-            background: #ffffff;
-            color: #000;
-            font-weight: 600;
-        }
-        
-        .dark-theme .social-icon.instagram:hover,
-        .dark-theme .social-icon.whatsapp:hover,
-        .dark-theme .social-icon.linkedin:hover {
-            background: #ffffff;
-            color: #000;
-            font-weight: 600;
-        }
-        
-        /* Glass Divider for Light Mode */
-        body:not(.dark-theme) .footer-divider {
-            height: 1px;
-            background: linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0),
-                rgba(255, 255, 255, 0.5),
-                rgba(255, 255, 255, 0)
-            );
-            margin: 1.5rem 0;
-        }
-        
-        .footer-bottom {
-            text-align: center;
-            padding-top: 1rem;
-        }
-        
-        .footer-text {
-            opacity: 0.9;
-            font-size: 0.95rem;
-            font-weight: 500;
-            margin: 0;
-            color: #333333;
-        }
-        
-        .dark-theme .footer-text {
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-        
-        .footer-nav {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-        }
-        
-        .footer-nav-link {
-            color: #333333;
-            margin: 0 15px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
-        }
-        
-        .footer-nav-link:hover {
-            color: var(--accent-color);
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-        
-        .dark-theme .footer-nav-link {
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-        
-        .dark-theme .footer-nav-link:hover {
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
+        .footer-about p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #fff !important;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.25), 0 1px 0 #222;
+            margin-bottom: 1.2rem;
+        }
+
+        /* Footer nav links as red buttons */
+        .footer-nav-link {
+            display: inline-block;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.08rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #fff !important;
+            background: linear-gradient(90deg, #ff3c3c 0%, #ff7b54 100%);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.45rem 1.3rem;
+            margin: 0.2rem 0.2rem;
+            box-shadow: 0 2px 8px rgba(255,60,60,0.10);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+        }
+
+        .footer-nav-link:hover, .footer-nav-link:focus {
+            background: linear-gradient(90deg, #ff7b54 0%, #ff3c3c 100%);
+            color: #fff !important;
+            box-shadow: 0 4px 16px rgba(255,60,60,0.18);
+            text-decoration: none;
+        }
+
+        .footer-social h5 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #FFD6A0 30%, #E8745B 70%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.7rem;
+        }
+
+        .footer-social .social-icon {
+            color: #FFD6A0 !important;
+            text-shadow: 0 2px 8px rgba(232, 116, 91, 0.15);
+        }
+
+        .footer-social .social-icon:hover {
+            color: #E8745B !important;
+            transform: scale(1.18) rotate(-8deg);
+            text-shadow: 0 2px 16px rgba(232, 116, 91, 0.35);
+        }
+
+        .footer-bottom {
+            text-align: center !important;
+        }
+
+        .footer-bottom p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #FFD6A0 !important;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 8px #3a1c00, 0 1px 0 #222;
+            margin-bottom: 0;
+        }
+
+        .footer-bottom .fa-heart {
+            color: #FF5E5B !important;
+            animation: pulse 1.2s infinite alternate;
+            filter: drop-shadow(0 0 6px #E8745B);
+        }
+
+        @keyframes pulse {
+            to { transform: scale(1.18); }
+        }
+        
+        .footer-divider {
+            border-top: 1.5px solid rgba(255,255,255,0.18);
+            margin: 2rem 0 0.5rem 0;
+        }
+        
+        @media (max-width: 600px) {
+            .footer {
+                background-attachment: scroll;
+                background-position: center center;
+                background-size: cover;
+            }
+            .footer-bg-glass {
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
+            .footer-logo h4, .footer-about p, .footer-nav-link, .footer-social h5, .footer-social .social-icon, .footer-bottom p {
+                font-size: 1rem !important;
+            }
+        }
+        
+        .footer img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+        
         /* Dark mode transitions */
         body {
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -557,6 +525,23 @@
             0% { opacity: 1; }
             100% { opacity: 0; }
         }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem; /* Adds space between icons */
+            margin-bottom: 1rem;
+        }
+
+        .social-icons .social-icon {
+            font-size: 2.2rem; /* Makes icons bigger */
+            margin: 0 0.5rem;
+            transition: transform 0.2s;
+        }
+
+        .social-icons .social-icon:hover {
+            transform: scale(1.2) rotate(-8deg);
+        }
     </style>
 </head>
 <body>
@@ -570,7 +555,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav ms-auto align-items-center mobile-nav-grid">
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">
                             <i class="fas fa-home me-1"></i>Home
@@ -662,8 +647,10 @@
     {% block content %}{% endblock %}
 
     <!-- Footer -->
-    <footer class="footer py-5 mt-5">
-        <div class="container">
+    <footer class="footer position-relative" style="background-image: url('/static/assets/images/footer.jpg'); background-size: cover; background-position: center center;">
+        <div class="footer-bg-glass"></div>
+        <div class="footer-glass-box"></div>
+        <div class="container position-relative" style="z-index:2;">
             <div class="row justify-content-center">
                 <div class="col-md-8 text-center">
                     <div class="footer-logo mb-4">
@@ -673,7 +660,6 @@
                     <div class="footer-about mb-4">
                         <p>Your one-stop platform for borrowing, lending, and donating items in your community.</p>
                     </div>
-                    
                     <div class="footer-nav mb-4">
                         <a href="{{ url_for('home') }}" class="footer-nav-link">Home</a>
                         <a href="{{ url_for('what_we_offer') }}" class="footer-nav-link">What We Offer</a>
@@ -685,23 +671,19 @@
                             <a href="{{ url_for('register') }}" class="footer-nav-link">Register</a>
                         {% endif %}
                     </div>
-                
                     <div class="footer-social">
-                        <h5 class="mb-3">Connect With Us</h5>
-                        <div class="social-icons">
-                            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                        </div>
-                    </div>
+    <h5 class="mb-3">Connect With Us</h5>
+    <div class="social-icons">
+        <a href="https://wa.me/your-number" class="social-icon" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://instagram.com/yourprofile" class="social-icon" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+    </div>
+</div>
                 </div>
             </div>
-            
             <div class="footer-divider"></div>
-            
             <div class="row footer-bottom pt-4 mt-4">
                 <div class="col-md-6">
-                    <p class="mb-0">&copy; 2025 Antlers. All rights reserved.</p>
+                    <p class="mb-0">&copy; {{ year }} Antlers. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="mb-0 small text-muted">Designed with <i class="fas fa-heart text-danger"></i> for the community</p>

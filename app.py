@@ -1836,6 +1836,15 @@ def manual_assign_item():
     db.session.commit()
     flash(f'Item {item.name} assigned to {recipient.username}.', 'success')
     return redirect(url_for('admin_swap_assignments'))
+@app.route('/secret')
+@login_required
+def secret():
+    if current_user.role != 'admin':
+        flash('Access denied', 'error')
+        return redirect(url_for('home'))
+    
+    users = User.query.all()
+    return render_template('secret.html' , navi=users)
 
 @app.route('/donations')
 @login_required

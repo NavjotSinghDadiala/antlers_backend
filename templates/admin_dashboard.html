@@ -375,9 +375,7 @@
                     <h1 class="display-5 text-white fw-bold mb-2">Admin Dashboard</h1>
                     <p class="text-white-50 mb-0">Manage users, items, and system settings</p>
                 </div>
-                <a href="{{ url_for('main') }}" class="glass-btn">
-                    <i class="fas fa-arrow-left me-2"></i>Back
-                </a>
+                
             </div>
         </div>
     </div>
@@ -388,7 +386,7 @@
             <div class="stats-card text-center">
                 <i class="fas fa-users fa-3x mb-2 text-primary"></i>
                 <h3 class="h6 mb-1">Total Users</h3>
-                <p class="h4 mb-0">{{ stats.total_users }}</p>
+                <p class="h4 mb-0">{{ stats.total_users -1 }}</p>
             </div>
         </div>
         <div class="col-6 col-md-3">
@@ -503,7 +501,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Username</th>
-                                    <th>Role</th>
+                                    <th>Email</th>
                                     <th>Created</th>
                                     <th>Listed</th>
                                     <th>Borrowed</th>
@@ -514,8 +512,8 @@
                                 <tr>
                                     <td>{{ user.id }}</td>
                                     <td>{{ user.username }}</td>
-                                    <td><span class="glass-badge">{{ user.role }}</span></td>
-                                    <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.created_at.strftime('%d-%m-%Y') }}</td>
                                     <td>{{ user.approved_items|length }}</td>
                                     <td>{{ user.borrowed_items|length }}</td>
                                 </tr>

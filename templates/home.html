@@ -37,146 +37,171 @@
 
 <!-- Available Items Section with Depth Effect -->
 <div id="available-items" class="section py-5">
-    <div class="container py-4" data-depth="0.15">
-        <div class="row mb-5">
-            <div class="col-12 text-center">
-                <div class="section-header">
-                    <span class="section-subheading">Our Collection</span>
-                    <h2 class="section-title display-5 fw-bold mb-2 fade-in">Available Items</h2>
-                    <div class="coffee-divider">
-                        <span></span><i class="fas fa-mug-hot"></i><span></span>
+    <div class="glass-bg"></div>
+    <div class="glass-outer-box">
+        <div class="container py-4" data-depth="0.15">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <div class="section-header">
+                        <span class="section-subheading">Our Collection</span>
+                        <h2 class="section-title display-5 fw-bold mb-2 fade-in available-items-title">Available Items</h2>
+                        <div class="coffee-divider">
+                            <span></span><i class="fas fa-mug-hot"></i><span></span>
+                        </div>
+                        <p class="text-muted mb-5 fade-in available-items-desc">Browse our collection of items shared by community members</p>
                     </div>
-                    <p class="text-muted mb-5 fade-in">Browse our collection of items shared by community members</p>
-                </div>
-                
-                <!-- Category Filter -->
-                <div class="mb-5 fade-in">
-                    <div class="filter-container d-flex justify-content-center gap-2 flex-wrap category-filter-buttons">
-                        <button class="filter-btn active" data-category="all">
-                            <i class="fas fa-th-large me-2"></i>All
-                        </button>
-                        <button class="filter-btn" data-category="earrings">
-                            <i class="fas fa-gem me-2"></i>Earrings
-                        </button>
-                        <button class="filter-btn" data-category="necklace">
-                            <i class="fas fa-link me-2"></i>Necklace
-                        </button>
-                        <button class="filter-btn" data-category="others">
-                            <i class="fas fa-star me-2"></i>Others
-                        </button>
+                    
+                    <!-- Category Filter -->
+                    <div class="mb-5 fade-in">
+                        <div class="filter-container category-filter-grid">
+                            <button class="filter-btn active" data-category="all">
+                                <i class="fas fa-th-large me-2"></i>All
+                            </button>
+                            <button class="filter-btn" data-category="jewelry">
+                                <i class="fas fa-gem me-2"></i>Jewelry
+                            </button>
+                            <button class="filter-btn" data-category="stationery">
+                                <i class="fas fa-pencil-alt me-2"></i>Stationery
+                            </button>
+                            <button class="filter-btn" data-category="sports_equipment">
+                                <i class="fas fa-football-ball me-2"></i>Sports Equipment
+                            </button>
+                            <button class="filter-btn" data-category="event_props">
+                                <i class="fas fa-theater-masks me-2"></i>Event Props
+                            </button>
+                            <button class="filter-btn" data-category="tools">
+                                <i class="fas fa-tools me-2"></i>Tools
+                            </button>
+                            <button class="filter-btn" data-category="musical_instruments">
+                                <i class="fas fa-music me-2"></i>Musical Instruments
+                            </button>
+                            <button class="filter-btn" data-category="others">
+                                <i class="fas fa-star me-2"></i>Others
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="item-grid">
-            {% for item in items %}
-            <div class="fade-in" data-category="{{ item.category|lower }}" data-depth="{{ 0.1 + loop.index0 * 0.02 }}">
-                <div class="card h-100 border-0 shadow-sm item-card">
-                    <div class="card-img-wrapper">
-                        {% if item.image %}
-                        <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" 
-                             class="card-img-top" 
-                             alt="{{ item.name }}"
-                             data-bs-toggle="modal" 
-                             data-bs-target="#imageModal{{ item.id }}"
-                             style="cursor: pointer;">
-                        <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge rounded-pill bg-accent px-3 py-2 shadow-sm">
-                                <i class="fas fa-tag me-1"></i>{{ item.category }}
-                            </span>
+            <div class="item-grid">
+                {% for item in items %}
+                <div class="fade-in" data-category="{{ item.category|lower }}" data-depth="{{ 0.1 + loop.index0 * 0.02 }}">
+                    <div class="card h-100 border-0 shadow-sm item-card glass-card position-relative">
+                        <div class="card-img-wrapper position-relative">
+                            {% if item.image %}
+                            <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" 
+                                 class="card-img-top" 
+                                 alt="{{ item.name }}"
+                                 data-bs-toggle="modal" 
+                                 data-bs-target="#imageModal{{ item.id }}"
+                                 style="cursor: pointer;">
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge rounded-pill bg-accent px-3 py-2 shadow-sm">
+                                    <i class="fas fa-tag me-1"></i>{{ item.category }}
+                                </span>
+                            </div>
+                            <div class="img-overlay position-absolute bottom-0 start-0 w-100 p-2 d-flex justify-content-between align-items-end" style="background: linear-gradient(0deg, rgba(0,0,0,0.5) 80%, transparent 100%);">
+                                <span class="badge bg-light text-dark me-2">{{ item.type|capitalize }}</span>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal{{ item.id }}" class="text-white"><i class="fas fa-search-plus fa-lg"></i></a>
+                            </div>
+                            {% else %}
+                            <div class="no-image-placeholder d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image text-muted fa-3x"></i>
+                            </div>
+                            {% endif %}
                         </div>
-                        {% else %}
-                        <div class="no-image-placeholder d-flex align-items-center justify-content-center">
-                            <i class="fas fa-image text-muted fa-3x"></i>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="card-body p-4">
-                        <h5 class="card-title fw-bold mb-3">{{ item.name }}</h5>
-                        <div class="card-text">
+                        <div class="card-body p-4">
+                            <h5 class="card-title fw-bold mb-2">{{ item.name }}</h5>
+                            <p class="card-text text-muted mb-2" style="min-height:2.5em;">{{ item.description[:80] }}{% if item.description and item.description|length > 80 %}...{% endif %}</p>
                             <div class="d-flex align-items-center mb-2 text-muted">
                                 <div class="icon-circle me-2">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
                                 <span>{{ item.location }}</span>
                             </div>
-                            <div class="d-flex align-items-center mb-3 text-muted">
+                            <div class="d-flex align-items-center mb-2 text-muted">
                                 <div class="icon-circle me-2">
                                     <i class="fas fa-clock"></i>
                                 </div>
                                 <span>{{ item.datetime }}</span>
                             </div>
-                        </div>
-                        {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('borrow_item', item_id=item.id) }}" class="btn btn-primary w-100 rounded-pill">
-                                <i class="fas fa-hand-holding-usd me-2"></i>Borrow Now
-                            </a>
-                        {% else %}
-                            <div class="login-prompt p-3 rounded bg-soft-accent border text-center">
-                                <i class="fas fa-info-circle text-primary me-2"></i>
-                                <a href="{{ url_for('login') }}" class="text-decoration-none">Login</a> or 
-                                <a href="{{ url_for('register') }}" class="text-decoration-none">Register</a> to borrow
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="https://ui-avatars.com/api/?name={{ item.owner.username if item.owner else 'User' }}&background=E8745B&color=fff&rounded=true&size=32" class="rounded-circle me-2" alt="Owner" style="width:32px;height:32px;">
+                                <span class="small text-muted">{{ item.owner.username if item.owner else 'User' }}</span>
                             </div>
+                            {% if current_user.is_authenticated %}
+                                <a href="{{ url_for('borrow_item', item_id=item.id) }}" class="btn btn-primary w-100 rounded-pill">
+                                    <i class="fas fa-hand-holding-usd me-2"></i>Borrow Now
+                                </a>
+                            {% else %}
+                                <div class="login-prompt p-3 rounded bg-soft-accent border text-center">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>
+                                    <a href="{{ url_for('login') }}" class="text-decoration-none">Login</a> or 
+                                    <a href="{{ url_for('register') }}" class="text-decoration-none">Register</a> to borrow
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- Image Modal -->
+                        {% if item.image %}
+                        <div class="modal fade" id="imageModal{{ item.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header border-0">
+                                        <h5 class="modal-title">{{ item.name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-0 text-center">
+                                        <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" 
+                                             class="img-fluid" 
+                                             alt="{{ item.name }}"
+                                             style="max-height: 80vh; width: auto;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         {% endif %}
                     </div>
-                    
-                    <!-- Image Modal -->
-                    {% if item.image %}
-                    <div class="modal fade" id="imageModal{{ item.id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header border-0">
-                                    <h5 class="modal-title">{{ item.name }}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body p-0 text-center">
-                                    <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" 
-                                         class="img-fluid" 
-                                         alt="{{ item.name }}"
-                                         style="max-height: 80vh; width: auto;">
-                                </div>
-                            </div>
+                </div>
+                {% else %}
+                <div class="col-12">
+                    <div class="empty-state card fade-in border-0 shadow-sm p-5 text-center">
+                        <div class="empty-state-icon mb-4">
+                            <i class="fas fa-box-open fa-4x text-muted opacity-50"></i>
                         </div>
+                        <h3 class="h4 mb-3">No Items Available</h3>
+                        <p class="text-muted mb-4">Check back later for new items or be the first to list something!</p>
+                        {% if current_user.is_authenticated %}
+                        <div class="text-center">
+                            <a href="{{ url_for('lend') }}" class="btn btn-outline-primary rounded-pill px-4">
+                                <i class="fas fa-plus-circle me-2"></i>List an Item
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
+                {% endfor %}
             </div>
-            {% else %}
-            <div class="col-12">
-                <div class="empty-state card fade-in border-0 shadow-sm p-5 text-center">
-                    <div class="empty-state-icon mb-4">
-                        <i class="fas fa-box-open fa-4x text-muted opacity-50"></i>
-                    </div>
-                    <h3 class="h4 mb-3">No Items Available</h3>
-                    <p class="text-muted mb-4">Check back later for new items or be the first to list something!</p>
-                    {% if current_user.is_authenticated %}
-                    <div class="text-center">
-                        <a href="{{ url_for('lend') }}" class="btn btn-outline-primary rounded-pill px-4">
-                            <i class="fas fa-plus-circle me-2"></i>List an Item
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- Call to Action -->
-        <div class="cta-container text-center mt-5 pt-5 fade-in">
-            <h3 class="mb-4">Ready to share your items with the community?</h3>
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('lend') }}" class="btn btn-primary btn-lg rounded-pill px-4 py-2 shadow-sm">
-                    <i class="fas fa-share-alt me-2"></i>Lend an Item
-                </a>
-            {% else %}
-                <a href="{{ url_for('register') }}" class="btn btn-accent btn-lg rounded-pill px-4 py-2 shadow-sm">
-                    <i class="fas fa-user-plus me-2"></i>Join Antlers
-                </a>
-            {% endif %}
         </div>
     </div>
 </div>
+
+<!-- Move CTA to footer -->
+{% block page_footer %}
+<footer class="cta-footer bg-light py-5 mt-5 border-top">
+    <div class="container text-center">
+        <h3 class="mb-4">Ready to share your items with the community?</h3>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('lend') }}" class="btn btn-primary btn-lg rounded-pill px-4 py-2 shadow-sm">
+                <i class="fas fa-share-alt me-2"></i>Lend an Item
+            </a>
+        {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-accent btn-lg rounded-pill px-4 py-2 shadow-sm">
+                <i class="fas fa-user-plus me-2"></i>Join Antlers
+            </a>
+        {% endif %}
+    </div>
+</footer>
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -659,6 +684,231 @@
         background-color: rgba(255, 255, 255, 0.1);
         border-color: rgba(255, 255, 255, 0.8);
         transform: translateY(-3px);
+    }
+
+    /* Nav grid for main navigation */
+    .nav-grid-btn {
+        font-size: 1.1rem;
+        border-radius: 1.5rem;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        transition: all 0.2s;
+    }
+    .nav-grid-btn:hover {
+        background: var(--accent-color);
+        color: #fff;
+        border-color: var(--accent-color);
+    }
+    @media (max-width: 600px) {
+        .nav-grid .col-6 { flex: 0 0 50%; max-width: 50%; }
+    }
+
+    /* Category filter grid for mobile */
+    .category-filter-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    @media (min-width: 500px) {
+        .category-filter-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    @media (min-width: 900px) {
+        .category-filter-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+    }
+
+    /* Footer CTA styling */
+    .cta-footer {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+        border-top: 1px solid #eee;
+        box-shadow: 0 -2px 16px rgba(0,0,0,0.03);
+    }
+
+    @media (max-width: 600px) {
+        .section-title, .display-5, h2, h3, h4, h5 {
+            font-size: 1.1rem !important;
+        }
+        .section-subheading {
+            font-size: 0.8rem !important;
+        }
+        .coffee-divider {
+            margin: 0.5rem auto 1rem !important;
+        }
+        .filter-container, .category-filter-grid {
+            padding: 0.2rem !important;
+            gap: 0.2rem !important;
+        }
+        .filter-btn {
+            padding: 0.3rem 0.5rem !important;
+            font-size: 0.85rem !important;
+            border-radius: 1rem !important;
+        }
+        .item-grid {
+            gap: 0.7rem !important;
+            grid-template-columns: 1fr !important;
+        }
+        .item-card, .glass-card {
+            border-radius: 0.7rem !important;
+        }
+        .card-body, .card-body.p-4 {
+            padding: 0.7rem !important;
+        }
+        .card-title {
+            font-size: 1rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+        .card-text {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .btn, .btn-primary, .btn-outline-primary, .btn-accent {
+            font-size: 0.95rem !important;
+            padding: 0.4rem 0.7rem !important;
+            border-radius: 1.2rem !important;
+        }
+        .login-prompt {
+            font-size: 0.9rem !important;
+            padding: 0.5rem !important;
+        }
+        .cta-footer h3 {
+            font-size: 1.1rem !important;
+            margin-bottom: 1rem !important;
+        }
+        .cta-footer .btn {
+            font-size: 1rem !important;
+            padding: 0.5rem 1rem !important;
+        }
+        .icon-circle {
+            width: 20px !important;
+            height: 20px !important;
+            font-size: 0.7rem !important;
+        }
+        .rounded-circle {
+            width: 24px !important;
+            height: 24px !important;
+        }
+        .card-img-wrapper {
+            height: 120px !important;
+        }
+        .card-img-top {
+            height: 100% !important;
+        }
+        /* Do NOT shrink hero section or hero-content */
+    }
+
+    /* Our Collection section background for desktop */
+    #available-items {
+        position: relative;
+        background: url('/static/assets/images/background2.jpg') no-repeat center center;
+        background-size: cover;
+        background-attachment: fixed;
+        overflow: hidden;
+    }
+    @media (max-width: 600px) {
+        #available-items {
+            background: url('/static/assets/images/background1.jpeg') no-repeat center center;
+            background-size: cover;
+            background-attachment: scroll;
+        }
+    }
+    #available-items .glass-bg {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(30,30,30,0.22); /* darker overlay for better contrast */
+        backdrop-filter: blur(1px); /* much less blur for visible bg */
+        -webkit-backdrop-filter: blur(2px);
+        z-index: 0;
+        border-radius: 0.7rem;
+    }
+    #available-items > .container,
+    #available-items .section-header,
+    #available-items .item-grid,
+    #available-items .category-filter-grid,
+    #available-items .filter-container {
+        position: relative;
+        z-index: 1;
+    }
+
+    #available-items .item-card, #available-items .glass-card {
+        background: rgba(255,255,255,0.97) !important;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        color: #222 !important;
+    }
+    #available-items .filter-container,
+#available-items .category-filter-grid {
+    background: rgba(255, 255, 255, 0.08); /* light glassy */
+    backdrop-filter: blur(8px); /* glassmorphism */
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    padding: 0.75rem 1rem;
+}
+
+#available-items .filter-btn {
+    background: rgba(255, 255, 255, 0.06); /* faint glass button */
+    color: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    font-weight: 500;
+    border-radius: 2rem;
+    padding: 0.45rem 1.2rem;
+    transition: all 0.3s ease;
+}
+
+#available-items .filter-btn:hover,
+#available-items .filter-btn.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-color: #ffb9ec;
+    transform: translateY(-1px);
+}
+
+    #available-items .filter-btn:hover, #available-items .filter-btn:focus {
+        background: #7E57C2 !important;
+        color: #fff !important;
+        border: 1.5px solid #7E57C2 !important;
+        transform: translateY(-2px) scale(1.04);
+    }
+    #available-items .filter-btn.active {
+        background: #E8745B !important;
+        color: #fff !important;
+        border: 1.5px solid #E8745B !important;
+    }
+
+    /* Glassy outer box for available-items */
+    #available-items .glass-outer-box {
+        position: relative;
+        z-index: 1;
+        background: rgba(40,40,60,0.32); /* slightly darker glass, but not darker than bg */
+        border-radius: 2.5rem;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.16);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(10px);
+        margin: 0 auto;
+        padding: 3.5rem 2.2rem;
+        max-width: 1400px;
+    }
+    @media (max-width: 900px) {
+        #available-items .glass-outer-box {
+            padding: 2rem 0.7rem;
+            border-radius: 1.5rem;
+            max-width: 98vw;
+        }
+    }
+    @media (max-width: 600px) {
+        #available-items .glass-outer-box {
+            padding: 1.2rem 0.1rem;
+            border-radius: 1rem;
+        }
+    }
+    /* Make Our Collection, Available Items, and description text bright */
+    .section-subheading, .available-items-title, .available-items-desc {
+        color: #fff !important;
+        text-shadow: 0 2px 12px rgba(0,0,0,0.25), 0 1px 0 #222;
     }
 </style>
 {% endblock %}
