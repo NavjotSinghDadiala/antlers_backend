@@ -72,12 +72,14 @@ class User(db.Model, UserMixin):
     # Borrowed items (items this user has borrowed)
     items_borrowed = db.relationship('BorrowedAccessory',
                                    foreign_keys='BorrowedAccessory.borrower_id',
-                                   backref=db.backref('borrower_user', lazy=True))
+                                   backref=db.backref('borrower_user', lazy=True),
+                                   overlaps="items_borrowed_as_borrower,borrower")
     
     # Lent items (items this user has lent to others)
     items_lent = db.relationship('BorrowedAccessory',
                                 foreign_keys='BorrowedAccessory.lender_id',
-                                backref=db.backref('lender_user', lazy=True))
+                                backref=db.backref('lender_user', lazy=True),
+                                overlaps="items_lent_as_lender,lender")
 
 class PendingAccessory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -124,8 +126,8 @@ class BorrowedAccessory(db.Model):
     
     # Relationships
     accessory = db.relationship('Accessory', backref='borrow_requests')
-    borrower = db.relationship('User', foreign_keys=[borrower_id], backref='items_borrowed_as_borrower')
-    lender = db.relationship('User', foreign_keys=[lender_id], backref='items_lent_as_lender')
+    borrower = db.relationship('User', foreign_keys=[borrower_id], backref='items_borrowed_as_borrower', overlaps="items_borrowed,borrower_user")
+    lender = db.relationship('User', foreign_keys=[lender_id], backref='items_lent_as_lender', overlaps="items_lent,lender_user")
 
 class RejectedBorrowRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
