@@ -23,10 +23,14 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'antlers-secret-key-2003'
 
 # Configure database
+instance_path = os.path.join(app.root_path, 'instance')
+if not os.path.exists(instance_path):
+    os.makedirs(instance_path)
+db_path = os.path.join(instance_path, 'antlers.db')
 if 'DATABASE_URL' in environ:
     app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL').replace('postgres://', 'postgresql://')
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///antlers.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -1842,7 +1846,9 @@ def donations():
     rejected_donations = RejectedAccessory.query.filter_by(user_id=current_user.id, type='donate').all()
     return render_template('donation.html', approved_donations=approved_donations, rejected_donations=rejected_donations)
 
+# After all models and db/app initialization, but before route definitions
+with app.app_context():
+    create_tables_and_admin()
+
 if __name__ == '__main__':
-    with app.app_context():
-        create_tables_and_admin()
     app.run(debug=True)

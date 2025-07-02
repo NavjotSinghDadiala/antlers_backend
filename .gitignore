@@ -91,8 +91,6 @@ ENV/
 static/uploads/*
 !static/uploads/.gitkeep
 
-# SQLite database
-*.db
 
 # VS Code
 .vscode/ 
