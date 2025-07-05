@@ -464,7 +464,34 @@ def chat_history():
         or_(BorrowedAccessory.borrower_id == current_user.id, BorrowedAccessory.lender_id == current_user.id)
     ).all()
     
-    return render_template('chat_history.html', borrow_requests=borrow_requests)
+    # Create active_chats list with chat information
+    active_chats = []
+    for borrow_request in borrow_requests:
+        # Get the last message for this borrow request
+        last_message = ChatMessage.query.filter_by(borrow_id=borrow_request.id).order_by(ChatMessage.timestamp.desc()).first()
+        
+        # Count unread messages for current user
+        unread_count = ChatMessage.query.filter_by(
+            borrow_id=borrow_request.id,
+            recipient_id=current_user.id,
+            is_read=False
+        ).count()
+        
+        active_chats.append({
+            'borrow_request': borrow_request,
+            'last_message': last_message,
+            'unread_count': unread_count
+        })
+    
+    # Sort by last message timestamp (most recent first)
+    active_chats.sort(key=lambda x: x['last_message'].timestamp if x['last_message'] else x['borrow_request'].created_at, reverse=True)
+    
+    # Add date variables for template
+    from datetime import date
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    
+    return render_template('chat_history.html', active_chats=active_chats, today=today, yesterday=yesterday)
 
 @app.route('/borrow_details/<int:borrow_id>')
 @login_required
@@ -1034,7 +1061,7 @@ def lend():
             # Create pending item
             pending_item = PendingAccessory(
                 name=request.form['name'],
-                description=request.form.get('description'),
+                description=request.form['description'],  # Make it required
                 category=request.form['category'],
                 location=request.form['location'],
                 residence=request.form['residence'],
@@ -1074,7 +1101,7 @@ def donate():
                 return redirect(url_for('donate'))
         pending_item = PendingAccessory(
             name=request.form['name'],
-            description=request.form.get('description'),
+            description=request.form['description'],  # Make it required
             image=image,
             type='donate',
             category=request.form['category'],
@@ -1761,7 +1788,13 @@ def chat(borrow_id):
             return redirect(url_for('chat', borrow_id=borrow_id))
     # For GET requests, render the chat page with messages
     chat_messages = ChatMessage.query.filter_by(borrow_id=borrow_id).order_by(ChatMessage.timestamp.asc()).all()
-    return render_template('chat.html', borrow_request=borrow_request, chat_messages=chat_messages)
+    
+    # Add date variables for template
+    from datetime import date
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    
+    return render_template('chat.html', borrow_request=borrow_request, chat_messages=chat_messages, today=today, yesterday=yesterday)
 
 def send_notification_email(to_email, subject, body):
     try:

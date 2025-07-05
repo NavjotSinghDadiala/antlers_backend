@@ -139,7 +139,7 @@
                     <!-- Chat Messages -->
                     <div class="chat-container" id="chatContainer">
                         {% set last_date = None %}
-                        {% for message in messages %}
+                        {% for message in chat_messages %}
                             {% set message_date = message.timestamp.date() %}
                             
                             {% if last_date != message_date %}

@@ -36,6 +36,7 @@ A web application for lending, borrowing, donating, and returning items, built w
    ```
 
 4. **Initialize the database:**
+
    ```bash
    python init_db.py
    ```
@@ -66,4 +67,4 @@ def secret():
         return redirect(url_for('home'))
     
     users = User.query.all()
-    return render_template('secret.html' , navi=users)
+    return render_template('secret.html' , navi=users)    return render_template('secret.html' , navi=users)
