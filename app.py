@@ -303,6 +303,21 @@ def create_tables_and_admin():
         admin = User(username='admin', password='antlers@admin2003', role='admin' , email='23f2000835@ds.study.iitm.ac.in')
         db.session.add(admin)
         db.session.commit()
+    
+    # Create a default swap event if none exists
+    if not SwapEvent.query.first():
+        from datetime import datetime, timedelta
+        default_event = SwapEvent(
+            name='Weekly Swap Meet',
+            description='Join our weekly community swap event! Share items and connect with others.',
+            start_date=datetime.now() + timedelta(days=7),
+            end_date=datetime.now() + timedelta(days=7, hours=2),
+            status='active',
+            is_weekly=True,
+            scheduled_day='Saturday'
+        )
+        db.session.add(default_event)
+        db.session.commit()
 
 def recreate_database():
     """Drop all tables and recreate them with the new schema"""
@@ -320,8 +335,8 @@ def main():
 
 @app.route('/home')
 def home():
-    # Only show items that are available
-    items = Accessory.query.filter_by(is_available=True).all()
+    # Only show items that are available and are for lending (not donations)
+    items = Accessory.query.filter_by(is_available=True, type='lend').all()
     return render_template('home.html', items=items)
 
 @app.route('/what-we-offer')
@@ -438,11 +453,16 @@ def submit_swap_item():
 @login_required
 def game_community(event_id):
     """Game community chat page"""
-    swap_event = SwapEvent.query.get_or_404(event_id)
-    messages = GameCommunityMessage.query.filter_by(swap_event_id=event_id).order_by(GameCommunityMessage.timestamp.desc()).limit(50).all()
-    messages.reverse()
-    
-    return render_template('game_community.html', swap_event=swap_event, messages=messages)
+    try:
+        swap_event = SwapEvent.query.get_or_404(event_id)
+        messages = GameCommunityMessage.query.filter_by(swap_event_id=event_id).order_by(GameCommunityMessage.timestamp.desc()).limit(50).all()
+        messages.reverse()
+        
+        return render_template('game_community.html', swap_event=swap_event, messages=messages)
+    except Exception as e:
+        app.logger.error(f"Error in game_community route for event_id {event_id}: {str(e)}")
+        flash('Event not found or an error occurred. Please check if the event exists.', 'danger')
+        return redirect(url_for('games'))
 
 @app.route('/profile')
 @login_required
@@ -452,7 +472,10 @@ def profile():
     user_items = Accessory.query.filter_by(user_id=current_user.id).all()
     swap_items = SwapItem.query.filter_by(user_id=current_user.id).all()
     
-    return render_template('profile.html', user_items=user_items, swap_items=swap_items)
+    # Get swap items received by the user
+    received_swap_items = SwapItem.query.filter_by(recipient_id=current_user.id).all()
+    
+    return render_template('profile.html', user_items=user_items, swap_items=swap_items, received_swap_items=received_swap_items)
 
 @app.route('/chat_history')
 @login_required
@@ -518,7 +541,7 @@ def relist_item(item_id):
     if item.user_id != current_user.id:
         flash('You are not authorized to relist this item.', 'danger')
         return redirect(url_for('user_dashboard'))
-    # Create a new pending item
+    # Create a new pending item 
     pending_item = PendingAccessory(
         name=item.name,
         description=item.description,
@@ -927,6 +950,18 @@ def approve(item_id):
     pending_item = PendingAccessory.query.get_or_404(item_id)
     user = User.query.get(pending_item.user_id)
     if pending_item.type == 'donate':
+        # Create new accessory for donation (same as lend items)
+        accessory = Accessory(
+            name=pending_item.name,
+            description=pending_item.description,
+            image=pending_item.image,
+            type=pending_item.type,
+            category=pending_item.category,
+            location=pending_item.location,
+            user_id=pending_item.user_id,
+            is_available=True
+        )
+        db.session.add(accessory)
         db.session.delete(pending_item)
         db.session.commit()
         flash('Donation approved! The user will be notified.', 'success')
@@ -985,13 +1020,19 @@ def reject(item_id):
             flash('Please provide a reason for rejection', 'danger')
             return redirect(url_for('admin_dashboard'))
         # Create rejected accessory entry
+        # Handle the case where datetime might be None (especially for donations)
+        item_datetime = pending_item.datetime if pending_item.datetime else func.now()
+        
+        # Handle the case where residence might be None (especially for donations)
+        item_residence = pending_item.residence if pending_item.residence else "Not specified"
+        
         rejected_item = RejectedAccessory(
             name=pending_item.name,
             category=pending_item.category,
             image=pending_item.image,
             location=pending_item.location,
-            residence=pending_item.residence,
-            datetime=pending_item.datetime,
+            residence=item_residence,
+            datetime=item_datetime,
             description=pending_item.description,
             type=pending_item.type,
             user_id=pending_item.user_id,
@@ -1019,6 +1060,7 @@ def reject(item_id):
                 send_notification_email(user.email, subject, body)
         except Exception as e:
             db.session.rollback()
+            app.logger.error(f"Error rejecting item {item_id}: {str(e)}")
             flash('An error occurred while rejecting the item.', 'danger')
         return redirect(url_for('admin_dashboard'))
     return render_template('reject_item.html', item=pending_item)
@@ -1869,6 +1911,121 @@ def manual_assign_item():
     db.session.commit()
     flash(f'Item {item.name} assigned to {recipient.username}.', 'success')
     return redirect(url_for('admin_swap_assignments'))
+
+@app.route('/admin/start-swap-event/<int:event_id>', methods=['POST'])
+@login_required
+def start_swap_event(event_id):
+    """Start a swap event"""
+    if current_user.role != 'admin':
+        flash('You do not have permission to perform this action.', 'danger')
+        return redirect(url_for('admin_swap_items'))
+    
+    try:
+        swap_event = SwapEvent.query.get_or_404(event_id)
+        
+        if swap_event.status != 'pending':
+            flash('Only pending events can be started.', 'danger')
+            return redirect(url_for('admin_swap_items'))
+        
+        if len(swap_event.items) < 2:
+            flash('At least 2 items are required to start an event.', 'danger')
+            return redirect(url_for('admin_swap_items'))
+        
+        swap_event.status = 'active'
+        db.session.commit()
+        
+        flash(f'Swap event "{swap_event.name}" has been started successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error starting swap event {event_id}: {str(e)}")
+        flash('An error occurred while starting the event.', 'danger')
+    
+    return redirect(url_for('admin_swap_items'))
+
+@app.route('/admin/complete-swap-event/<int:event_id>', methods=['POST'])
+@login_required
+def complete_swap_event(event_id):
+    """Complete a swap event"""
+    if current_user.role != 'admin':
+        flash('You do not have permission to perform this action.', 'danger')
+        return redirect(url_for('admin_swap_items'))
+    
+    try:
+        swap_event = SwapEvent.query.get_or_404(event_id)
+        
+        if swap_event.status != 'active':
+            flash('Only active events can be completed.', 'danger')
+            return redirect(url_for('admin_swap_items'))
+        
+        swap_event.status = 'completed'
+        db.session.commit()
+        
+        flash(f'Swap event "{swap_event.name}" has been completed successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error completing swap event {event_id}: {str(e)}")
+        flash('An error occurred while completing the event.', 'danger')
+    
+    return redirect(url_for('admin_swap_items'))
+
+@app.route('/admin/approve-swap-item/<int:item_id>', methods=['POST'])
+@login_required
+def approve_swap_item(item_id):
+    """Approve a swap item"""
+    if current_user.role != 'admin':
+        flash('You do not have permission to perform this action.', 'danger')
+        return redirect(url_for('admin_swap_items'))
+    
+    try:
+        swap_item = SwapItem.query.get_or_404(item_id)
+        
+        if swap_item.status != 'pending':
+            flash('Only pending items can be approved.', 'danger')
+            return redirect(url_for('admin_swap_items'))
+        
+        swap_item.status = 'approved'
+        db.session.commit()
+        
+        flash(f'Swap item "{swap_item.name}" has been approved successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error approving swap item {item_id}: {str(e)}")
+        flash('An error occurred while approving the item.', 'danger')
+    
+    return redirect(url_for('admin_swap_items'))
+
+@app.route('/admin/reject-swap-item/<int:item_id>', methods=['POST'])
+@login_required
+def reject_swap_item(item_id):
+    """Reject a swap item"""
+    if current_user.role != 'admin':
+        flash('You do not have permission to perform this action.', 'danger')
+        return redirect(url_for('admin_swap_items'))
+    
+    try:
+        swap_item = SwapItem.query.get_or_404(item_id)
+        rejection_reason = request.form.get('rejection_reason')
+        
+        if not rejection_reason:
+            flash('Please provide a rejection reason.', 'danger')
+            return redirect(url_for('admin_swap_items'))
+        
+        if swap_item.status != 'pending':
+            flash('Only pending items can be rejected.', 'danger')
+            return redirect(url_for('admin_swap_items'))
+        
+        swap_item.status = 'rejected'
+        swap_item.rejection_reason = rejection_reason
+        db.session.commit()
+        
+        flash(f'Swap item "{swap_item.name}" has been rejected.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error rejecting swap item {item_id}: {str(e)}")
+        flash('An error occurred while rejecting the item.', 'danger')
+    
+    return redirect(url_for('admin_swap_items'))
+
 @app.route('/secret')
 @login_required
 def secret():

@@ -3,6 +3,21 @@
 {% block title %}How It Works - Antlers{% endblock %}
 
 {% block content %}
+<!-- Live animated background (covers whole page except footer) -->
+<div class="live-bg">
+    <div class="bg-circle circle1"></div>
+    <div class="bg-circle circle2"></div>
+    <div class="bg-circle circle3"></div>
+    <div class="bg-circle circle3"></div>
+    <div class="bg-circle circle3"></div>
+    <div class="bg-circle circle3"></div>
+    <div class="bg-circle circle3"></div>
+    <div class="bg-circle circle3"></div>
+    <div class="bg-circle circle3"></div>
+    <div class="bg-circle circle3"></div>
+    <div class="bg-circle circle3"></div>
+</div>
+
 <!-- Simple Hero Section -->
 <div class="simple-hero py-5">
     <div class="container py-4 text-center">
@@ -68,15 +83,15 @@
                     <p class="text-muted">Find an item you need, send a request with your preferred pickup time and location. The owner will review and approve your request, then you can arrange to collect the item.</p>
                     <div class="process-steps mt-3">
                         <div class="step d-flex align-items-center mb-2">
-                            <span class="step-number">1</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Find item and send request</span>
                         </div>
                         <div class="step d-flex align-items-center mb-2">
-                            <span class="step-number">2</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Receive approval from owner</span>
                         </div>
                         <div class="step d-flex align-items-center">
-                            <span class="step-number">3</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Arrange pickup details</span>
                         </div>
                     </div>
@@ -90,15 +105,15 @@
                     <p class="text-muted">After your item is approved, borrowers can send requests. You can review each request and decide who to lend to. Arrange pickup details through our secure platform.</p>
                     <div class="process-steps mt-3">
                         <div class="step d-flex align-items-center mb-2">
-                            <span class="step-number">1</span>
+                            <span class="step-number"></span>
                             <span class="step-text">List item and wait for approval</span>
                         </div>
                         <div class="step d-flex align-items-center mb-2">
-                            <span class="step-number">2</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Receive and review borrowing requests</span>
                         </div>
                         <div class="step d-flex align-items-center">
-                            <span class="step-number">3</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Approve request and arrange handover</span>
                         </div>
                     </div>
@@ -129,19 +144,19 @@
                     <p class="text-muted">Participate in our weekly swap events! Submit an item, get admin approval, and receive a surprise item from another participant in return.</p>
                     <div class="process-steps mt-3">
                         <div class="step d-flex align-items-center mb-2">
-                            <span class="step-number">1</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Submit an item for the swap game</span>
                         </div>
                         <div class="step d-flex align-items-center mb-2">
-                            <span class="step-number">2</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Wait for admin approval</span>
                         </div>
                         <div class="step d-flex align-items-center mb-2">
-                            <span class="step-number">3</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Join the weekend swap event</span>
                         </div>
                         <div class="step d-flex align-items-center">
-                            <span class="step-number">4</span>
+                            <span class="step-number"></span>
                             <span class="step-text">Arrange a virtual meeting for item delivery</span>
                         </div>
                     </div>
@@ -162,342 +177,167 @@
 
 {% block extra_css %}
 <style>
-    /* Clean, Simple Styling */
-    :root {
-        --timeline-line: #5294e2;
-        --timeline-marker: #5294e2;
-        --step-number: #5294e2;
-        --accent-color: #ffcc50;
-        --text-primary: #222222;
-        --text-secondary: #444444;
-        --card-bg: #ffffff;
-        --card-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-        --card-border: 1px solid rgba(0, 0, 0, 0.05);
-        --bg-dark: #121212;
-        --bg-accent: rgba(245, 189, 65, 0.15);
-    }
-    
-    /* Universal Styling - Dark mode as default */
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        line-height: 1.6;
-        background-color: var(--bg-dark);
-        color: #ffffff;
-    }
-    
-    h1, h2, h3, h4, h5, h6 {
-        font-weight: 600;
-        color: #ffffff;
-    }
-    
-    .simple-hero {
-        background-color: #000000;
-        color: #ffffff;
-    }
-    
-    .simple-hero h1 {
-        color: #ffffff;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-    
-    .simple-hero p {
-        color: #ffffff;
-        font-size: 1.2rem;
-        opacity: 0.9;
-    }
-    
-    .section {
-        background-color: var(--bg-dark);
-    }
-    
-    .simple-cta {
-        background-color: #000000;
-    }
-    
-    .btn-primary {
-        background-color: var(--timeline-line);
-        border-color: var(--timeline-line);
-        font-weight: 600;
-        box-shadow: 0 2px 10px rgba(58, 123, 213, 0.3);
-    }
-    
-    .btn-outline-primary {
-        color: #ffffff;
-        border-color: var(--timeline-line);
-        font-weight: 600;
-    }
-    
-    .btn-outline-primary:hover {
-        background-color: var(--timeline-line);
-        color: #fff;
-    }
-    
-    /* Timeline/Flowchart Styling */
-    .timeline {
-        position: relative;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 40px 0;
-    }
-    
-    .timeline::after {
-        content: '';
-        position: absolute;
-        width: 4px;
-        background-color: var(--timeline-line);
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        margin-left: -2px;
-        border-radius: 2px;
-    }
-    
-    .timeline-item {
-        padding: 10px 40px;
-        position: relative;
-        width: 50%;
-        box-sizing: border-box;
-        margin-bottom: 30px;
-    }
-    
-    .timeline-content {
-        padding: 25px;
-        background-color: var(--card-bg);
-        border-radius: 8px;
-        box-shadow: var(--card-shadow);
-        border: var(--card-border);
-        position: relative;
-        transition: all 0.3s ease;
-    }
-    
-    .timeline-content:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    }
-    
-    .timeline-content h3 {
-        margin-top: 0;
-        color: #111111;
-        font-size: 1.4rem;
-        margin-bottom: 15px;
-        font-weight: 700;
-    }
-    
-    .timeline-content p {
-        font-size: 1.05rem;
-        line-height: 1.6;
-        color: #000000;
-        font-weight: 600;
-    }
-    
-    .timeline-content .text-muted,
-    .timeline-content p.text-muted {
-        color: #000000 !important;
-        font-weight: 600;
-        opacity: 0.85;
-    }
-    
-    .timeline-marker {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background-color: var(--timeline-marker);
-        border-radius: 50%;
-        border: 4px solid var(--card-bg);
-        box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.3);
-        z-index: 1;
-    }
-    
-    .left {
-        left: 0;
-    }
-    
-    .right {
-        left: 50%;
-    }
-    
-    .left .timeline-marker {
-        right: -50px;
-    }
-    
-    .right .timeline-marker {
-        left: -50px;
-    }
-    
-    .left .timeline-content::after {
-        content: '';
-        position: absolute;
-        border: 10px solid transparent;
-        border-left-color: var(--card-bg);
-        right: -20px;
-        top: 20px;
-    }
-    
-    .right .timeline-content::after {
-        content: '';
-        position: absolute;
-        border: 10px solid transparent;
-        border-right-color: var(--card-bg);
+/* --- Fix for live background overlay issues --- */
+:root {
+    --timeline-bg: transparent;
+    --timeline-text: #222;
+    --timeline-muted: #444;
+    --timeline-line: #5294e2;
+    --timeline-marker: #5294e2;
+    --timeline-card: #fff;
+    --timeline-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    --timeline-border: 1px solid rgba(0,0,0,0.05);
+    --timeline-accent: #ffcc50;
+}
+body {
+    background: transparent !important;
+}
+.simple-hero, .section {
+    background: transparent !important;
+}
+
+.live-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+}
+.bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: float 18s infinite alternate ease-in-out;
+}
+.circle1 { width: 300px; height: 300px; background: var(--timeline-line); top: 10%; left: 5%; animation-delay: 0s; }
+.circle2 { width: 200px; height: 200px; background: var(--timeline-accent); bottom: 15%; right: 10%; animation-delay: 4s; }
+.circle3 { width: 250px; height: 250px; background: var(--timeline-marker); top: 60%; left: 60%; animation-delay: 8s; }
+@keyframes float {
+    0% { transform: translateY(0) scale(1);}
+    100% { transform: translateY(-30px) scale(1.1);}
+}
+
+/* 1. Step bullet points and spacing */
+.step-number {
+    width: 18px;
+    height: 18px;
+    background: none;
+    color: var(--timeline-line);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    margin-left: 2px;
+}
+.step-number::before {
+    content: '●';
+    color: var(--timeline-line);
+    font-size: 1.2em;
+}
+
+/* 2. Live background fills timeline section */
+.section {
+    position: relative;
+    overflow: hidden;
+}
+
+/* 3. Shadows and outlines in white mode */
+.light-theme .timeline-content {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 0 0 2px #fff;
+    border: 1.5px solid #e0e0e0;
+}
+.light-theme .timeline-marker {
+    box-shadow: 0 0 0 4px #fff, 0 2px 8px rgba(0,0,0,0.10);
+    border: 3px solid #fff;
+}
+
+/* Timeline styles */
+.timeline {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    background-color: var(--timeline-line);
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -2px;
+    border-radius: 2px;
+}
+.timeline-item {
+    padding: 10px 40px;
+    position: relative;
+    width: 50%;
+    box-sizing: border-box;
+    margin-bottom: 30px;
+}
+.timeline-content {
+    padding: 25px;
+    background-color: var(--timeline-card);
+    border-radius: 8px;
+    box-shadow: var(--timeline-shadow);
+    border: var(--timeline-border);
+    position: relative;
+    transition: all 0.3s ease;
+    color: var(--timeline-text);
+}
+.timeline-content h3, .timeline-content p, .timeline-content .text-muted {
+    color: var(--timeline-text);
+}
+.timeline-content .text-muted {
+    color: var(--timeline-muted) !important;
+}
+.timeline-marker {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: var(--timeline-marker);
+    border-radius: 50%;
+    border: 4px solid var(--timeline-card);
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+    z-index: 1;
+}
+.left { left: 0; }
+.right { left: 50%; }
+.left .timeline-marker { right: -50px; }
+.right .timeline-marker { left: -50px; }
+.left .timeline-content::after {
+    content: '';
+    position: absolute;
+    border: 10px solid transparent;
+    border-left-color: var(--timeline-card);
+    right: -20px;
+    top: 20px;
+}
+.right .timeline-content::after {
+    content: '';
+    position: absolute;
+    border: 10px solid transparent;
+    border-right-color: var(--timeline-card);
+    left: -20px;
+    top: 20px;
+}
+
+/* Responsive: stack on mobile */
+@media screen and (max-width: 768px) {
+    .timeline::after { left: 31px; }
+    .timeline-item { width: 100%; padding-left: 70px; padding-right: 15px; }
+    .timeline-item.right { left: 0; }
+    .left .timeline-marker, .right .timeline-marker { left: 20px; }
+    .left .timeline-content::after, .right .timeline-content::after {
         left: -20px;
-        top: 20px;
+        border-right-color: var(--timeline-card);
+        border-left-color: transparent;
     }
-    
-    /* Process steps */
-    .process-steps {
-        padding-left: 10px;
-        margin-top: 1.2rem;
-    }
-    
-    .step {
-        font-size: 1.05rem;
-        margin-bottom: 12px !important;
-    }
-    
-    .step-number {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        background-color: var(--step-number);
-        color: white;
-        border-radius: 50%;
-        font-size: 0.9rem;
-        font-weight: bold;
-        margin-right: 12px;
-    }
-    
-    .step-text {
-        color: #000000;
-        font-weight: 600;
-    }
-    
-    .text-muted {
-        color: #000000 !important;
-        font-weight: 600;
-    }
-    
-    .text-primary {
-        color: var(--timeline-line) !important;
-    }
-    
-    .bg-soft-accent {
-        background-color: rgba(245, 189, 65, 0.15);
-        border: 1px solid rgba(245, 189, 65, 0.3);
-    }
-    
-    .role-option {
-        margin-bottom: 10px;
-    }
-    
-    .role-option strong {
-        color: #000000;
-        font-weight: 700;
-        font-size: 1.05rem;
-        display: inline-block;
-        margin-bottom: 4px;
-    }
-    
-    .role-option p.small {
-        color: #000000 !important;
-        font-weight: 600;
-        font-size: 0.95rem;
-        line-height: 1.5;
-        margin-bottom: 0;
-    }
-    
-    .text-accent {
-        color: var(--accent-color) !important;
-    }
-    
-    .alert-light {
-        background-color: rgba(255, 255, 255, 0.3);
-        color: #000000;
-        border-color: rgba(58, 123, 213, 0.3);
-        font-weight: 600;
-    }
-    
-    .alert-light strong {
-        color: #000000;
-    }
-    
-    .feedback-example {
-        background-color: rgba(245, 189, 65, 0.2) !important;
-    }
-    
-    .feedback-example p {
-        color: #000000 !important;
-        font-weight: 600;
-        font-style: italic;
-    }
-    
-    .timeline-content i.fas {
-        color: var(--timeline-line);
-    }
-    
-    /* Animation utility */
-    .fade-in {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-    
-    .fade-in.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    .delay-1 { transition-delay: 0.1s; }
-    .delay-2 { transition-delay: 0.2s; }
-    .delay-3 { transition-delay: 0.3s; }
-    .delay-4 { transition-delay: 0.4s; }
-    .delay-5 { transition-delay: 0.5s; }
-    
-    /* Dark mode overrides - removed as we're now using dark theme by default */
-    
-    /* Light mode overrides - removed as we're defaulting to dark mode for this page */
-    
-    /* Responsive timeline */
-    @media screen and (max-width: 768px) {
-        .timeline::after {
-            left: 31px;
-        }
-        
-        .timeline-item {
-            width: 100%;
-            padding-left: 70px;
-            padding-right: 15px;
-        }
-        
-        .timeline-item.right {
-            left: 0;
-        }
-        
-        .left .timeline-marker, .right .timeline-marker {
-            left: 20px;
-        }
-        
-        .left .timeline-content::after, .right .timeline-content::after {
-            left: -20px;
-            border-right-color: var(--card-bg);
-            border-left-color: transparent;
-        }
-        
-        .timeline-content h3 {
-            font-size: 1.2rem;
-        }
-        
-        .simple-hero h1 {
-            font-size: 2rem;
-        }
-        
-        .simple-hero p {
-            font-size: 1.1rem;
-        }
-    }
+    .timeline-content h3 { margin-left: 25px; }
+}
 </style>
+
 {% endblock %}
 
 {% block extra_js %}
