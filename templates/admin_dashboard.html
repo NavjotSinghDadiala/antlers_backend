@@ -654,6 +654,24 @@
     </div>
 </div>
 
+<hr class="my-5">
+<h2>Blog Management</h2>
+<div class="mb-3">
+    <a href="{{ url_for('admin_blogs') }}" class="btn btn-primary me-2">Review & Approve Blogs</a>
+    <form action="{{ url_for('admin_generate_blog') }}" method="post" style="display:inline;">
+        <button type="submit" class="btn btn-success">Auto-Generate Blog Now</button>
+    </form>
+    <p class="text-muted mt-2">Blogs are also auto-generated every 24 hours.</p>
+</div>
+
+<hr class="my-5">
+<h2>Trending Topics Management</h2>
+<div class="mb-3">
+    <a href="{{ url_for('trending_topics_list') }}" class="btn btn-primary me-2">View All Topics</a>
+    <a href="{{ url_for('add_trending_topic') }}" class="btn btn-success me-2">Add New Topic</a>
+    <p class="text-muted mt-2">Add trending topics manually. AI will generate blogs for unprocessed active topics.</p>
+</div>
+
 <!-- Add this JavaScript for smooth scrolling -->
 <script>
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {

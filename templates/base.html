@@ -475,6 +475,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'blog' %}active{% endif %}" href="{{ url_for('blog') }}">
+                            <i class="fas fa-blog me-1"></i>Blog
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'what_we_offer' %}active{% endif %}" href="{{ url_for('what_we_offer') }}">
                             <i class="fas fa-list-ul me-1"></i>What We Offer
                         </a>
@@ -494,6 +499,7 @@
                             <i class="fas fa-gamepad me-1"></i>Games
                         </a>
                     </li>
+                    
                     
                     {% if current_user.is_authenticated %}
                         <!-- Services dropdown removed -->

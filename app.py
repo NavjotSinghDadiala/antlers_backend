@@ -15,6 +15,15 @@ import time
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from PIL import Image
+import re
+from slugify import slugify
+from sqlalchemy.orm import validates
+import json
+import requests
+from pytrends.request import TrendReq
+import subprocess
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 app = Flask(__name__)
@@ -112,6 +121,7 @@ class Accessory(db.Model):
     type = db.Column(db.String(50))  # 'lend' or 'donate'
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=func.now())
+    slug = db.Column(db.String(200), unique=True, nullable=True)
 
 class BorrowedAccessory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -296,17 +306,56 @@ class GameCommunityMessage(db.Model):
     user = db.relationship('User', backref=db.backref('game_community_messages', lazy=True))
     swap_event = db.relationship('SwapEvent', backref=db.backref('community_messages', lazy=True))
 
+class ContactMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    subject = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(255))  # Optional image path
+    created_at = db.Column(db.DateTime, default=func.now())
+
+class BlogPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(200), unique=True, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    tags = db.Column(db.String(200))  # comma-separated
+    author = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=func.now())
+    updated_at = db.Column(db.DateTime, default=func.now(), onupdate=func.now())
+    image_url = db.Column(db.String(255))
+    status = db.Column(db.String(20), default='draft')  # 'draft', 'approved'
+    source_links = db.Column(db.Text)  # JSON or comma-separated links
+    ai_generated = db.Column(db.Boolean, default=True)
+
+    @validates('slug')
+    def convert_slug(self, key, value):
+        return value.lower().replace(' ', '-')
+
+class TrendingTopic(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    topic_name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    status = db.Column(db.String(20), default='active')  # 'active', 'inactive'
+    created_at = db.Column(db.DateTime, default=func.now())
+    processed = db.Column(db.Boolean, default=False)  # Track if blog has been generated for this topic
+
 # Function to create tables and the admin user
 def create_tables_and_admin():
-    db.create_all()  # Creates tables if they don't exist
+    db.create_all()  
+    from datetime import datetime, timedelta
+    admin = None
+    user = None
     if not User.query.filter_by(username='admin').first():
-        admin = User(username='admin', password='antlers@admin2003', role='admin' , email='23f2000835@ds.study.iitm.ac.in')
+        admin = User(username='admin', password='antlers@admin2003', role='admin', email='23f2000835@ds.study.iitm.ac.in', overall_verified=True)
         db.session.add(admin)
+    if not User.query.filter_by(username='user').first() and not User.query.filter_by(email='dadialanavjotsingh15@gmail.com').first():
+        user = User(username='navi', password='123456', role='user', email='dadialanavjotsingh15@gmail.com', contact_number='9987334843', created_at=datetime.now(), overall_verified=True)
+        db.session.add(user)
+    if admin or user:
         db.session.commit()
-    
-    # Create a default swap event if none exists
     if not SwapEvent.query.first():
-        from datetime import datetime, timedelta
         default_event = SwapEvent(
             name='Weekly Swap Meet',
             description='Join our weekly community swap event! Share items and connect with others.',
@@ -319,15 +368,7 @@ def create_tables_and_admin():
         db.session.add(default_event)
         db.session.commit()
 
-def recreate_database():
-    """Drop all tables and recreate them with the new schema"""
-    db.drop_all()
-    db.create_all()
-    # Recreate admin user
-    if not User.query.filter_by(username='admin').first():
-        admin = User(username='admin', password='antlers@admin2003', role='admin')
-        db.session.add(admin)
-        db.session.commit()
+
 
 @app.route('/')
 def main():
@@ -337,6 +378,10 @@ def main():
 def home():
     # Only show items that are available and are for lending (not donations)
     items = Accessory.query.filter_by(is_available=True, type='lend').all()
+    for item in items:
+        if not item.slug:
+            item.slug = slugify(item.name)
+            db.session.commit()
     return render_template('home.html', items=items)
 
 @app.route('/what-we-offer')
@@ -463,6 +508,46 @@ def game_community(event_id):
         app.logger.error(f"Error in game_community route for event_id {event_id}: {str(e)}")
         flash('Event not found or an error occurred. Please check if the event exists.', 'danger')
         return redirect(url_for('games'))
+
+@app.route('/contactus', methods=['GET', 'POST'])
+def contactus():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        subject = request.form.get('subject', '').strip()
+        message = request.form.get('message', '').strip()
+        image_file = request.files.get('image')
+        errors = []
+        image_path = None
+        if not name:
+            errors.append('Name is required.')
+        if not email:
+            errors.append('Email is required.')
+        if not subject:
+            errors.append('Subject is required.')
+        if not message:
+            errors.append('Message is required.')
+        if image_file and image_file.filename:
+            if allowed_file(image_file.filename):
+                image_path = save_file(image_file)
+            else:
+                errors.append('Invalid image file type. Allowed: png, jpg, jpeg, gif.')
+        if errors:
+            for error in errors:
+                flash(error, 'danger')
+            return render_template('contactus.html')
+        contact_message = ContactMessage(
+            name=name,
+            email=email,
+            subject=subject,
+            message=message,
+            image=image_path
+        )
+        db.session.add(contact_message)
+        db.session.commit()
+        flash('Your message has been sent! We will contact you soon.', 'success')
+        return redirect(url_for('contactus'))
+    return render_template('contactus.html')
 
 @app.route('/profile')
 @login_required
@@ -1067,9 +1152,26 @@ def reject(item_id):
 
 def save_file(file):
     if file:
+        from PIL import Image
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
+        # Open the image using Pillow
+        image = Image.open(file)
+        # Optionally, resize if width > 1080px
+        max_width = 1080
+        if image.width > max_width:
+            w_percent = (max_width / float(image.width))
+            h_size = int((float(image.height) * float(w_percent)))
+            try:
+                resample = Image.Resampling.LANCZOS
+            except AttributeError:
+                resample = Image.ANTIALIAS
+            image = image.resize((max_width, h_size), resample)
+        # Convert to RGB if needed (for JPEG)
+        if image.mode in ("RGBA", "P"):
+            image = image.convert("RGB")
+        # Save the image with optimized quality
+        image.save(file_path, optimize=True, quality=70)
         return f'uploads/{filename}'  # Return relative path for template
     return None
 
@@ -2048,6 +2150,436 @@ def donations():
 # After all models and db/app initialization, but before route definitions
 with app.app_context():
     create_tables_and_admin()
+
+def generate_slug(name):
+    slug = re.sub(r'[^a-zA-Z0-9]+', '-', name.lower()).strip('-')
+    return slug
+
+@app.route('/item/<slug>')
+def item_detail(slug):
+    item = Accessory.query.filter_by(slug=slug).first_or_404()
+    # Fetch related items in the same category, excluding the current item
+    related_items = Accessory.query.filter(Accessory.category == item.category, Accessory.id != item.id, Accessory.is_available == True).limit(4).all()
+    return render_template('item_detail.html', item=item, related_items=related_items)
+
+# Email notification for new draft using Gmail SMTP and environment variables
+
+def notify_admin_new_draft(blog):
+    admin_email = os.getenv('GMAIL_USER')
+    admin_pass = os.getenv('GMAIL_PASS')
+    subject = 'New AI Blog Draft Ready'
+    body = f"A new AI-generated blog draft is ready for review: {blog.title}\n\nGo to your admin dashboard to review and approve."
+    msg = MIMEMultipart()
+    msg['From'] = admin_email
+    msg['To'] = admin_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(admin_email, admin_pass)
+            server.sendmail(admin_email, admin_email, msg.as_string())
+    except Exception as e:
+        print(f"Failed to send admin notification email: {e}")
+
+# Admin: List all blog drafts and approved blogs
+@app.route('/admin/blogs')
+@login_required
+def admin_blogs():
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main'))
+    drafts = BlogPost.query.filter_by(status='draft').order_by(BlogPost.created_at.desc()).all()
+    approved = BlogPost.query.filter_by(status='approved').order_by(BlogPost.created_at.desc()).all()
+    return render_template('admin_blog_dashboard.html', drafts=drafts, approved=approved)
+
+# Admin: Edit/approve a blog draft
+@app.route('/admin/blogs/edit/<int:blog_id>', methods=['GET', 'POST'])
+@login_required
+def edit_blog(blog_id):
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main'))
+    blog = BlogPost.query.get_or_404(blog_id)
+    if request.method == 'POST':
+        blog.title = request.form['title']
+        blog.slug = slugify(blog.title)
+        blog.content = request.form['content']
+        blog.tags = request.form['tags']
+        blog.author = request.form['author']
+        blog.image_url = request.form['image_url']
+        blog.status = 'approved' if 'approve' in request.form else 'draft'
+        db.session.commit()
+        flash('Blog updated.' if blog.status == 'draft' else 'Blog approved and published!', 'success')
+        return redirect(url_for('admin_blogs'))
+    return render_template('edit_blog.html', blog=blog)
+
+# Admin: Delete a blog
+@app.route('/admin/blogs/delete/<int:blog_id>', methods=['POST'])
+@login_required
+def delete_blog(blog_id):
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main'))
+    blog = BlogPost.query.get_or_404(blog_id)
+    db.session.delete(blog)
+    db.session.commit()
+    flash('Blog deleted.', 'success')
+    return redirect(url_for('admin_blogs'))
+
+# Public: Blog listing (only approved)
+@app.route('/blog')
+def blog():
+    page = request.args.get('page', 1, type=int)
+    per_page = 3
+    posts = BlogPost.query.filter_by(status='approved').order_by(BlogPost.created_at.desc()).paginate(page=page, per_page=per_page)
+    categories = list(set(tag for post in BlogPost.query.filter_by(status='approved').all() for tag in (post.tags or '').split(',')))
+    recent_posts = BlogPost.query.filter_by(status='approved').order_by(BlogPost.created_at.desc()).limit(5).all()
+    # Parse source_links JSON for each post
+    for post in posts.items:
+        if post.source_links:
+            try:
+                post.links = json.loads(post.source_links)
+            except Exception:
+                post.links = []
+        else:
+            post.links = []
+    return render_template('blog_list.html', posts=posts, categories=categories, recent_posts=recent_posts)
+
+# Public: Individual blog post (only approved)
+@app.route('/blog/<slug>')
+def blog_post(slug):
+    post = BlogPost.query.filter_by(slug=slug, status='approved').first_or_404()
+    categories = list(set(tag for post in BlogPost.query.filter_by(status='approved').all() for tag in (post.tags or '').split(',')))
+    recent_posts = BlogPost.query.filter_by(status='approved').order_by(BlogPost.created_at.desc()).limit(5).all()
+    # Parse source_links JSON for this post
+    if post.source_links:
+        try:
+            post.links = json.loads(post.source_links)
+        except Exception:
+            post.links = []
+    else:
+        post.links = []
+    return render_template('blog_post.html', post=post, categories=categories, recent_posts=recent_posts)
+
+def get_google_trends(n=5):
+    try:
+        pytrends = TrendReq(hl='en-US', tz=360)
+        df = pytrends.trending_searches(pn='india')  # try with pn='united_states' or your country
+        return df.head(n)[0].tolist()
+    except Exception as e:
+        print(f"Google Trends fetch error: {e}")
+        return []
+
+def get_perplexity_blog(topic, api_key, num_sources=2):
+    url = 'https://api.perplexity.ai/chat/completions'
+    prompt = (
+        f"Write a short, SEO-friendly blog article about '{topic}' using 2-3 trusted sources. Include a references section at the end."
+    )
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        "model": "sonar-deep-research",
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }
+    try:
+        response = requests.post(url, headers=headers, json=data, timeout=60)
+        response.raise_for_status()
+        result = response.json()
+        content = result['choices'][0]['message']['content']
+        # Try to extract links from the references section
+        links = []
+        if 'http' in content:
+            links = [line for line in content.split('\n') if 'http' in line]
+        return content, links
+    except Exception as e:
+        print(f"Perplexity API error: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"Perplexity API response: {e.response.text}")
+        return None, []
+
+def get_gemini_blog(topic, api_key):
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
+    prompt = (
+        f"Write a concise, SEO-friendly blog article about '{topic}'. Include headers, a short intro, and a references section at the end."
+    )
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    data = {
+        "contents": [
+            {"parts": [{"text": prompt}]}
+        ]
+    }
+    try:
+        response = requests.post(f"{url}?key={api_key}", headers=headers, json=data, timeout=120)
+        response.raise_for_status()
+        result = response.json()
+        content = result['candidates'][0]['content']['parts'][0]['text']
+        # Try to extract links from the references section
+        links = []
+        if 'http' in content:
+            links = [line for line in content.split('\n') if 'http' in line]
+        return content, links
+    except Exception as e:
+        print(f"Gemini API error: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"Gemini API response: {e.response.text}")
+        return None, []
+
+def get_gemini_trending_topics(api_key, n=4):
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+    prompt = f'''
+List the top {n} trending topics in India today for a general audience. 
+Return only the topic titles as a plain list. It can be related to any topics like news, tech, entertainment, finance, sports, or health. and specifically for SEO
+'''
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    data = {
+        "contents": [
+            {"parts": [{"text": prompt}]}
+        ]
+    }
+    try:
+        response = requests.post(f"{url}?key={api_key}", headers=headers, json=data, timeout=60)
+        response.raise_for_status()
+        result = response.json()
+        text = result['candidates'][0]['content']['parts'][0]['text']
+        # Split into lines and clean up
+        topics = [line.strip('-•. 1234567890') for line in text.split('\n') if line.strip()]
+        return topics[:n]
+    except Exception as e:
+        print(f"Gemini trending topics error: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"Gemini API response: {e.response.text}")
+        return []
+
+def get_gemini_blog_content(topic, api_key):
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+    prompt = f'''
+ for the topic: "{topic}", write a short, SEO-friendly blog article focusing on the LATEST developments and current trends. The blog must include:
+
+- A catchy, keyword-rich title that ranks well in search and reflects the most recent developments.
+- A brief introduction (2–3 sentences) that hooks the reader and explains why this topic is trending RIGHT NOW.
+- Well-structured content with clear H2 or H3 headings focusing on RECENT developments.
+- Use bullet points where it improves readability (especially for lists or tips).
+- A short conclusion that summarizes key points or encourages action.
+- A "References" section at the end with links to any facts, stats, or reports used.
+- A 160-character SEO-optimized meta description that summarizes the post.
+- 5–7 SEO-relevant keywords listed at the very end, separated by commas.
+- An SEO-friendly URL slug (just the slug part, no domain) that is:
+  * 3-5 words maximum
+  * Uses hyphens between words
+  * Contains the main keyword
+  * Is easy to read and remember
+  * Example format: "latest-ai-breakthrough-2024" or "recent-tech-trends"
+
+IMPORTANT: Focus on the MOST RECENT developments, latest news, current trends, and what's happening RIGHT NOW. Avoid general information and instead emphasize what's new, trending, or recently discovered about this topic.
+
+Maintain a friendly, informative tone. Ensure the language is simple and engaging for a general Indian audience. Optimize for readability and Google Search ranking. Avoid plagiarism.
+
+At the very end, add a line starting with "SLUG:" followed by the SEO-friendly slug.
+'''
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    data = {
+        "contents": [
+            {"parts": [{"text": prompt}]}
+        ]
+    }
+    try:
+        response = requests.post(f"{url}?key={api_key}", headers=headers, json=data, timeout=60)
+        response.raise_for_status()
+        result = response.json()
+        content = result['candidates'][0]['content']['parts'][0]['text']
+        
+        # Extract slug from content
+        slug = None
+        if 'SLUG:' in content:
+            slug_line = [line for line in content.split('\n') if line.strip().startswith('SLUG:')]
+            if slug_line:
+                slug = slug_line[0].replace('SLUG:', '').strip()
+                # Remove the SLUG line from content
+                content = '\n'.join([line for line in content.split('\n') if not line.strip().startswith('SLUG:')])
+        
+        # Try to extract links from the references section
+        links = []
+        if 'http' in content:
+            links = [line for line in content.split('\n') if 'http' in line]
+        
+        return content, links, slug
+    except Exception as e:
+        print(f"Gemini blog content error: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"Gemini API response: {e.response.text}")
+        return None, [], None
+
+def ai_generate_blogs():
+    gemini_api_key = os.getenv('GEMINI_API_KEY')
+    if not gemini_api_key:
+        print("Gemini API key not set in environment.")
+        return
+    
+    # Get unprocessed active trending topics
+    topics = TrendingTopic.query.filter_by(status='active', processed=False).all()
+    if not topics:
+        print("No unprocessed trending topics found.")
+        try:
+            flash('No unprocessed trending topics found. Add some topics in the admin dashboard.', 'info')
+        except:
+            pass
+        return
+    
+    for topic_obj in topics:
+        topic = topic_obj.topic_name
+        # Generate content and slug using Gemini
+        content, links, generated_slug = get_gemini_blog_content(topic, gemini_api_key)
+        if not content:
+            continue
+        
+        # Use generated slug or create a fallback
+        if generated_slug:
+            slug = generated_slug
+        else:
+            slug = slugify(topic)
+        
+        # Ensure slug is unique
+        counter = 1
+        original_slug = slug
+        while BlogPost.query.filter_by(slug=slug).first():
+            slug = f"{original_slug}-{counter}"
+            counter += 1
+        
+        blog = BlogPost(
+            title=topic,
+            slug=slug,
+            content=content,
+            tags=topic.lower(),
+            author='Gemini AI',
+            image_url='uploads/default_blog.jpg',
+            status='draft',
+            source_links=json.dumps(links),
+            ai_generated=True
+        )
+        db.session.add(blog)
+        
+        # Mark topic as processed
+        topic_obj.processed = True
+        
+        db.session.commit()
+        notify_admin_new_draft(blog)
+    
+    print("AI blog generation complete.")
+
+# Schedule AI blog generation every 24 hours
+scheduler = BackgroundScheduler()
+scheduler.add_job(ai_generate_blogs, 'interval', hours=24, id='ai_blog_generation')
+scheduler.start()
+
+@app.route('/admin/generate-blog', methods=['POST'])
+@login_required
+def admin_generate_blog():
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    ai_generate_blogs()
+    flash('AI blog generation triggered. Drafts will appear in the blog dashboard shortly.', 'success')
+    return redirect(url_for('admin_blogs'))
+
+@app.route('/admin/trending-topics')
+@login_required
+def trending_topics_list():
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    topics = TrendingTopic.query.order_by(TrendingTopic.created_at.desc()).all()
+    return render_template('admin_trending_topics.html', topics=topics)
+
+@app.route('/admin/add-trending-topic', methods=['GET', 'POST'])
+@login_required
+def add_trending_topic():
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    if request.method == 'POST':
+        topic_name = request.form.get('topic_name', '').strip()
+        description = request.form.get('description', '').strip()
+        status = request.form.get('status', 'active')
+        
+        if not topic_name:
+            flash('Topic name is required.', 'danger')
+            return redirect(url_for('add_trending_topic'))
+        
+        # Check if topic already exists
+        if TrendingTopic.query.filter_by(topic_name=topic_name).first():
+            flash('Topic already exists.', 'danger')
+            return redirect(url_for('add_trending_topic'))
+        
+        topic = TrendingTopic(
+            topic_name=topic_name,
+            description=description,
+            status=status
+        )
+        db.session.add(topic)
+        db.session.commit()
+        flash('Trending topic added successfully!', 'success')
+        return redirect(url_for('trending_topics_list'))
+    
+    return render_template('admin_add_trending_topic.html')
+
+@app.route('/admin/edit-trending-topic/<int:topic_id>', methods=['GET', 'POST'])
+@login_required
+def edit_trending_topic(topic_id):
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    topic = TrendingTopic.query.get_or_404(topic_id)
+    
+    if request.method == 'POST':
+        topic_name = request.form.get('topic_name', '').strip()
+        description = request.form.get('description', '').strip()
+        status = request.form.get('status', 'active')
+        
+        if not topic_name:
+            flash('Topic name is required.', 'danger')
+            return redirect(url_for('edit_trending_topic', topic_id=topic_id))
+        
+        # Check if topic name already exists (excluding current topic)
+        existing_topic = TrendingTopic.query.filter_by(topic_name=topic_name).first()
+        if existing_topic and existing_topic.id != topic_id:
+            flash('Topic name already exists.', 'danger')
+            return redirect(url_for('edit_trending_topic', topic_id=topic_id))
+        
+        topic.topic_name = topic_name
+        topic.description = description
+        topic.status = status
+        db.session.commit()
+        flash('Trending topic updated successfully!', 'success')
+        return redirect(url_for('trending_topics_list'))
+    
+    return render_template('admin_edit_trending_topic.html', topic=topic)
+
+@app.route('/admin/delete-trending-topic/<int:topic_id>', methods=['POST'])
+@login_required
+def delete_trending_topic(topic_id):
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    
+    topic = TrendingTopic.query.get_or_404(topic_id)
+    db.session.delete(topic)
+    db.session.commit()
+    flash('Trending topic deleted successfully!', 'success')
+    return redirect(url_for('trending_topics_list'))
 
 if __name__ == '__main__':
     app.run(debug=True)

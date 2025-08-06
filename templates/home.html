@@ -89,12 +89,12 @@
                     <div class="card h-100 border-0 shadow-sm item-card glass-card position-relative">
                         <div class="card-img-wrapper position-relative">
                             {% if item.image %}
-                            <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" 
-                                 class="card-img-top" 
-                                 alt="{{ item.name }}"
-                                 data-bs-toggle="modal" 
-                                 data-bs-target="#imageModal{{ item.id }}"
-                                 style="cursor: pointer;">
+                            <a href="{{ url_for('item_detail', slug=item.slug) }}">
+                                <img src="{{ url_for('static', filename=item.image.replace('\\', '/') if item.image else 'default.jpg') }}" 
+                                     class="card-img-top" 
+                                     alt="{{ item.name }}"
+                                     style="cursor: pointer;">
+                            </a>
                             <div class="position-absolute top-0 end-0 m-2">
                                 <span class="badge rounded-pill bg-accent px-3 py-2 shadow-sm">
                                     <i class="fas fa-tag me-1"></i>{{ item.category }}
@@ -111,7 +111,9 @@
                             {% endif %}
                         </div>
                         <div class="card-body p-4">
-                            <h5 class="card-title fw-bold mb-2">{{ item.name }}</h5>
+                            <h5 class="card-title fw-bold mb-2">
+                                <a href="{{ url_for('item_detail', slug=item.slug) }}" class="text-decoration-none text-dark">{{ item.name }}</a>
+                            </h5>
                             <p class="card-text text-muted mb-2" style="min-height:2.5em;">
                                 {% if item.description %}
                                     {{ item.description }}{% if item.description|length > 80 %}...{% endif %}
