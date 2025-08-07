@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
+from flask_cors import CORS
 from datetime import datetime, timedelta
 import os
 from werkzeug.utils import secure_filename
@@ -28,6 +29,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
+# Enable CORS for frontend/backend separation
+CORS(app, origins=["http://localhost:3000", "http://localhost:5000", "http://127.0.0.1:3000", "http://127.0.0.1:5000"])
+
 # Configure secret key
 app.config['SECRET_KEY'] = 'antlers-secret-key-2003'
 
@@ -39,7 +43,8 @@ db_path = os.path.join(instance_path, 'antlers.db')
 if 'DATABASE_URL' in environ:
     app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL').replace('postgres://', 'postgresql://')
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    # Use PostgreSQL as default instead of SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:navisd1503@localhost:2003/antlers'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -332,14 +337,6 @@ class BlogPost(db.Model):
     @validates('slug')
     def convert_slug(self, key, value):
         return value.lower().replace(' ', '-')
-
-class TrendingTopic(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    topic_name = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text)
-    status = db.Column(db.String(20), default='active')  # 'active', 'inactive'
-    created_at = db.Column(db.DateTime, default=func.now())
-    processed = db.Column(db.Boolean, default=False)  # Track if blog has been generated for this topic
 
 # Function to create tables and the admin user
 def create_tables_and_admin():
@@ -2362,28 +2359,18 @@ Return only the topic titles as a plain list. It can be related to any topics li
 def get_gemini_blog_content(topic, api_key):
     url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
     prompt = f'''
- for the topic: "{topic}", write a short, SEO-friendly blog article focusing on the LATEST developments and current trends. The blog must include:
+ for the topic: "{topic}", write a short, SEO-friendly blog article. The blog must include:
 
-- A catchy, keyword-rich title that ranks well in search and reflects the most recent developments.
-- A brief introduction (2–3 sentences) that hooks the reader and explains why this topic is trending RIGHT NOW.
-- Well-structured content with clear H2 or H3 headings focusing on RECENT developments.
+- A catchy, keyword-rich title that ranks well in search.
+- A brief introduction (2–3 sentences) that hooks the reader and explains why the topic matters today.
+- Well-structured content with clear H2 or H3 headings.
 - Use bullet points where it improves readability (especially for lists or tips).
 - A short conclusion that summarizes key points or encourages action.
-- A "References" section at the end with links to any facts, stats, or reports used.
+- A “References” section at the end with links to any facts, stats, or reports used.
 - A 160-character SEO-optimized meta description that summarizes the post.
 - 5–7 SEO-relevant keywords listed at the very end, separated by commas.
-- An SEO-friendly URL slug (just the slug part, no domain) that is:
-  * 3-5 words maximum
-  * Uses hyphens between words
-  * Contains the main keyword
-  * Is easy to read and remember
-  * Example format: "latest-ai-breakthrough-2024" or "recent-tech-trends"
-
-IMPORTANT: Focus on the MOST RECENT developments, latest news, current trends, and what's happening RIGHT NOW. Avoid general information and instead emphasize what's new, trending, or recently discovered about this topic.
 
 Maintain a friendly, informative tone. Ensure the language is simple and engaging for a general Indian audience. Optimize for readability and Google Search ranking. Avoid plagiarism.
-
-At the very end, add a line starting with "SLUG:" followed by the SEO-friendly slug.
 '''
     headers = {
         'Content-Type': 'application/json'
@@ -2398,64 +2385,39 @@ At the very end, add a line starting with "SLUG:" followed by the SEO-friendly s
         response.raise_for_status()
         result = response.json()
         content = result['candidates'][0]['content']['parts'][0]['text']
-        
-        # Extract slug from content
-        slug = None
-        if 'SLUG:' in content:
-            slug_line = [line for line in content.split('\n') if line.strip().startswith('SLUG:')]
-            if slug_line:
-                slug = slug_line[0].replace('SLUG:', '').strip()
-                # Remove the SLUG line from content
-                content = '\n'.join([line for line in content.split('\n') if not line.strip().startswith('SLUG:')])
-        
         # Try to extract links from the references section
         links = []
         if 'http' in content:
             links = [line for line in content.split('\n') if 'http' in line]
-        
-        return content, links, slug
+        return content, links
     except Exception as e:
         print(f"Gemini blog content error: {e}")
         if hasattr(e, 'response') and e.response is not None:
             print(f"Gemini API response: {e.response.text}")
-        return None, [], None
+        return None, []
 
 def ai_generate_blogs():
     gemini_api_key = os.getenv('GEMINI_API_KEY')
     if not gemini_api_key:
         print("Gemini API key not set in environment.")
         return
-    
-    # Get unprocessed active trending topics
-    topics = TrendingTopic.query.filter_by(status='active', processed=False).all()
+    topics = get_gemini_trending_topics(gemini_api_key, n=4)
     if not topics:
-        print("No unprocessed trending topics found.")
+        print("No topics found from Gemini.")
         try:
-            flash('No unprocessed trending topics found. Add some topics in the admin dashboard.', 'info')
+            flash('Failed to fetch trending topics. Please try again later.', 'danger')
         except:
             pass
         return
-    
-    for topic_obj in topics:
-        topic = topic_obj.topic_name
-        # Generate content and slug using Gemini
-        content, links, generated_slug = get_gemini_blog_content(topic, gemini_api_key)
+    for topic in topics:
+        # Avoid duplicate blogs for the same topic
+        slug = slugify(topic)
+        if BlogPost.query.filter_by(slug=slug).first():
+            continue
+        # content, links = get_perplexity_blog(topic, perplexity_api_key)  # Perplexity commented out
+        content, links = get_gemini_blog_content(topic, gemini_api_key)
         if not content:
             continue
-        
-        # Use generated slug or create a fallback
-        if generated_slug:
-            slug = generated_slug
-        else:
-            slug = slugify(topic)
-        
-        # Ensure slug is unique
-        counter = 1
-        original_slug = slug
-        while BlogPost.query.filter_by(slug=slug).first():
-            slug = f"{original_slug}-{counter}"
-            counter += 1
-        
         blog = BlogPost(
             title=topic,
             slug=slug,
@@ -2468,13 +2430,8 @@ def ai_generate_blogs():
             ai_generated=True
         )
         db.session.add(blog)
-        
-        # Mark topic as processed
-        topic_obj.processed = True
-        
         db.session.commit()
         notify_admin_new_draft(blog)
-    
     print("AI blog generation complete.")
 
 # Schedule AI blog generation every 24 hours
@@ -2491,95 +2448,6 @@ def admin_generate_blog():
     ai_generate_blogs()
     flash('AI blog generation triggered. Drafts will appear in the blog dashboard shortly.', 'success')
     return redirect(url_for('admin_blogs'))
-
-@app.route('/admin/trending-topics')
-@login_required
-def trending_topics_list():
-    if current_user.role != 'admin':
-        flash('Access denied.', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    topics = TrendingTopic.query.order_by(TrendingTopic.created_at.desc()).all()
-    return render_template('admin_trending_topics.html', topics=topics)
-
-@app.route('/admin/add-trending-topic', methods=['GET', 'POST'])
-@login_required
-def add_trending_topic():
-    if current_user.role != 'admin':
-        flash('Access denied.', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    if request.method == 'POST':
-        topic_name = request.form.get('topic_name', '').strip()
-        description = request.form.get('description', '').strip()
-        status = request.form.get('status', 'active')
-        
-        if not topic_name:
-            flash('Topic name is required.', 'danger')
-            return redirect(url_for('add_trending_topic'))
-        
-        # Check if topic already exists
-        if TrendingTopic.query.filter_by(topic_name=topic_name).first():
-            flash('Topic already exists.', 'danger')
-            return redirect(url_for('add_trending_topic'))
-        
-        topic = TrendingTopic(
-            topic_name=topic_name,
-            description=description,
-            status=status
-        )
-        db.session.add(topic)
-        db.session.commit()
-        flash('Trending topic added successfully!', 'success')
-        return redirect(url_for('trending_topics_list'))
-    
-    return render_template('admin_add_trending_topic.html')
-
-@app.route('/admin/edit-trending-topic/<int:topic_id>', methods=['GET', 'POST'])
-@login_required
-def edit_trending_topic(topic_id):
-    if current_user.role != 'admin':
-        flash('Access denied.', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    topic = TrendingTopic.query.get_or_404(topic_id)
-    
-    if request.method == 'POST':
-        topic_name = request.form.get('topic_name', '').strip()
-        description = request.form.get('description', '').strip()
-        status = request.form.get('status', 'active')
-        
-        if not topic_name:
-            flash('Topic name is required.', 'danger')
-            return redirect(url_for('edit_trending_topic', topic_id=topic_id))
-        
-        # Check if topic name already exists (excluding current topic)
-        existing_topic = TrendingTopic.query.filter_by(topic_name=topic_name).first()
-        if existing_topic and existing_topic.id != topic_id:
-            flash('Topic name already exists.', 'danger')
-            return redirect(url_for('edit_trending_topic', topic_id=topic_id))
-        
-        topic.topic_name = topic_name
-        topic.description = description
-        topic.status = status
-        db.session.commit()
-        flash('Trending topic updated successfully!', 'success')
-        return redirect(url_for('trending_topics_list'))
-    
-    return render_template('admin_edit_trending_topic.html', topic=topic)
-
-@app.route('/admin/delete-trending-topic/<int:topic_id>', methods=['POST'])
-@login_required
-def delete_trending_topic(topic_id):
-    if current_user.role != 'admin':
-        flash('Access denied.', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    topic = TrendingTopic.query.get_or_404(topic_id)
-    db.session.delete(topic)
-    db.session.commit()
-    flash('Trending topic deleted successfully!', 'success')
-    return redirect(url_for('trending_topics_list'))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -8,4 +8,5 @@ if __name__ == "__main__":
         scheduler_thread.daemon = True
         scheduler_thread.start()
         
-    app.run(use_reloader=False) # Disable reloader to prevent duplicate scheduler threads 
+    # Run the app with host binding for external access
+    app.run(host='0.0.0.0', port=5000, use_reloader=False, debug=True) 
