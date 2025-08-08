@@ -44,7 +44,7 @@ if 'DATABASE_URL' in environ:
     app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL').replace('postgres://', 'postgresql://')
 else:
     # Use PostgreSQL as default instead of SQLite
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:navisd1503@localhost:2003/antlers'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://antlers_user:yEg3kRvtE6nFjjfPV09wK5eA9MdOEqPL@dpg-d2astjbuibrs73f13290-a.oregon-postgres.render.com:5432/antlers?sslmode=require'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
